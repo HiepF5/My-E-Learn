@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:math';
 import '../../models/review_item.dart';
 import '../../models/touch_history_item.dart';
 import '../../providers/auth_provider.dart';
@@ -21,6 +22,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
   TouchHistoryItem? _touch;
   bool _submittingTouch = false;
   Map<int, String> _wordLabelById = const {};
+  List<VocabularyOption> _vocabularyOptions = const [];
 
   @override
   void initState() {
@@ -32,6 +34,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
     final service = ReviewService(ref.read(apiClientProvider), CacheService());
     final data = await service.getTodayReview(limit: 20);
     final wordMap = await service.getVocabularyWordMapByIds(data.map((e) => e.wordId).toList());
+    final vocabOptions = await service.getVocabularyOptions();
     TouchHistoryItem? touch;
     if (data.isNotEmpty) {
       touch = await service.getTouchHistory(data.first.wordId);
@@ -40,6 +43,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
     setState(() {
       _items = data;
       _wordLabelById = wordMap;
+      _vocabularyOptions = vocabOptions;
       _touch = touch;
       _loading = false;
       _index = 0;
@@ -95,11 +99,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
 
   Future<int?> _askSelectedWordId() async {
     final currentWordId = _items[_index].wordId;
-    final optionIds = _items
-        .map((e) => e.wordId)
-        .where((wid) => wid != currentWordId)
-        .toSet()
-        .toList();
+    final optionIds = _buildMcqOptions(currentWordId).where((wid) => wid != currentWordId).toList();
 
     if (optionIds.isEmpty) return null;
 
@@ -121,7 +121,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                           value: wid,
                           groupValue: selectedId,
                           onChanged: (value) => setDialogState(() => selectedId = value),
-                          title: Text(_wordLabelById[wid] ?? 'Word #$wid'),
+                          title: Text(_wordForId(wid)),
                           subtitle: Text('ID: $wid'),
                         ),
                       )
@@ -144,6 +144,59 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
       },
     );
     return result;
+  }
+
+  List<int> _buildMcqOptions(int currentWordId) {
+    VocabularyOption? currentMeta;
+    for (final v in _vocabularyOptions) {
+      if (v.id == currentWordId) {
+        currentMeta = v;
+        break;
+      }
+    }
+    if (currentMeta == null) {
+      final fallback = _items.map((e) => e.wordId).where((id) => id != currentWordId).toSet().toList();
+      fallback.shuffle();
+      return [currentWordId, ...fallback.take(3)];
+    }
+
+    final topicSet = currentMeta.topicIds.toSet();
+    final candidates = _vocabularyOptions.where((v) => v.id != currentWordId).toList();
+
+    final sameTopic = candidates
+        .where((v) => topicSet.isNotEmpty && v.topicIds.any(topicSet.contains))
+        .toList();
+    final closeDifficulty = candidates
+        .where((v) => (v.difficulty - currentMeta.difficulty).abs() <= 1)
+        .toList();
+
+    final rnd = Random();
+    final picked = <int>{};
+
+    void pickFrom(List<VocabularyOption> source, int targetCount) {
+      final pool = source.where((v) => !picked.contains(v.id)).toList()..shuffle(rnd);
+      for (final v in pool) {
+        if (picked.length >= targetCount) break;
+        picked.add(v.id);
+      }
+    }
+
+    pickFrom(sameTopic, 3);
+    pickFrom(closeDifficulty, 3);
+    pickFrom(candidates, 3);
+
+    final options = <int>[currentWordId, ...picked.take(3)];
+    options.shuffle(rnd);
+    return options;
+  }
+
+  String _wordForId(int wordId) {
+    final inQueue = _wordLabelById[wordId];
+    if (inQueue != null && inQueue.isNotEmpty) return inQueue;
+    for (final v in _vocabularyOptions) {
+      if (v.id == wordId) return v.word;
+    }
+    return 'Word #$wordId';
   }
 
   int _currentTouchStep(TouchHistoryItem? touch) {
@@ -184,7 +237,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                     Text('Word ID: ${item.wordId}', style: Theme.of(context).textTheme.headlineSmall),
                     const SizedBox(height: 8),
                     Text(
-                      'Word: ${_wordLabelById[item.wordId] ?? "-"}',
+                      'Word: ${_wordForId(item.wordId)}',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 8),

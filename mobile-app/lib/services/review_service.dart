@@ -3,6 +3,20 @@ import '../models/touch_history_item.dart';
 import 'api_client.dart';
 import 'cache_service.dart';
 
+class VocabularyOption {
+  const VocabularyOption({
+    required this.id,
+    required this.word,
+    required this.difficulty,
+    required this.topicIds,
+  });
+
+  final int id;
+  final String word;
+  final int difficulty;
+  final List<int> topicIds;
+}
+
 class ReviewService {
   ReviewService(this._apiClient, this._cacheService);
   final ApiClient _apiClient;
@@ -41,6 +55,29 @@ class ReviewService {
       return map;
     } catch (_) {
       return {};
+    }
+  }
+
+  Future<List<VocabularyOption>> getVocabularyOptions() async {
+    try {
+      final res = await _apiClient.dio.get('/vocabulary');
+      final raw = (res.data['data'] as List<dynamic>? ?? []);
+      return raw.map((item) {
+        final row = (item as Map).cast<String, dynamic>();
+        final id = (row['id'] as num?)?.toInt() ?? 0;
+        final wordRaw = (row['word'] as String?)?.trim();
+        final difficulty = (row['difficulty'] as num?)?.toInt() ?? 1;
+        final topicIdsRaw = (row['topic_ids'] as List<dynamic>? ?? []);
+        final topicIds = topicIdsRaw.map((e) => (e as num).toInt()).toList();
+        return VocabularyOption(
+          id: id,
+          word: (wordRaw == null || wordRaw.isEmpty) ? 'Word #$id' : wordRaw,
+          difficulty: difficulty,
+          topicIds: topicIds,
+        );
+      }).where((v) => v.id > 0).toList();
+    } catch (_) {
+      return [];
     }
   }
 

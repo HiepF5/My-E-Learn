@@ -31,6 +31,8 @@ Per **FULL DATABASE PRODUCTION VERSION**:
 10. `daily_learning_log`
 11. `daily_review_queue` — spec lists as part of “first real” set; include early for “today” performance.
 
+- [x] Phase B implemented with Sequelize migrations (**option C**): created 11 tables + minimum indexes.
+
 **Indexes** (minimum):
 
 - `review_progress (user_id, next_review)`

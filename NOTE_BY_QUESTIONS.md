@@ -198,6 +198,32 @@ Muc dich: ghi lai nhung yeu cau ban da giao va nhung gi da duoc tao/sua de de to
 
 ---
 
+## 14) "Phase E - Review engine (critical path)"
+
+- Trang thai: DONE
+- Da lam:
+  - Tao `review.service.js` voi interval, ease_factor, reset khi sai, cap nhat `next_review`.
+  - Tao `POST /api/review/submit` de cap nhat `review_progress` va ghi `review_history`.
+  - Tao `GET /api/review/today` voi due items, support `limit`, sap xep `wrong_count DESC`, `next_review ASC`.
+  - Tao `jobs/review.job.js` chay hang ngay 00:00 de tao `daily_review_queue`.
+  - Da ho tro optional rating mapping: `Again/Hard/Good/Easy`.
+  - Cap nhat OpenAPI/Swagger cho review endpoints.
+- Files tao/sua:
+  - `backend/src/models/review-progress.model.js`
+  - `backend/src/models/review-history.model.js`
+  - `backend/src/models/daily-review-queue.model.js`
+  - `backend/src/repositories/review.repository.js`
+  - `backend/src/services/review.service.js`
+  - `backend/src/controllers/review.controller.js`
+  - `backend/src/validators/review.validator.js`
+  - `backend/src/routes/review.route.js`
+  - `backend/src/jobs/review.job.js`
+  - `backend/src/server.js`
+  - `backend/src/docs/openapi.yaml`
+  - `.cursor/skills/my-learn-e-project/reference-roadmap.md` (tick checklist)
+
+---
+
 ## Cach su dung file note nay
 
 - Moi yeu cau moi: them 1 section moi o cuoi file.

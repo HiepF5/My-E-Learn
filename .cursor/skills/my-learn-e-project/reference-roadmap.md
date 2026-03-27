@@ -54,11 +54,11 @@ Per **FULL DATABASE PRODUCTION VERSION**:
 
 ### Phase E — Review engine (≈ 1.5–2 weeks) — **critical path**
 
-- [ ] `review.service.js`: intervals, ease factor, wrong reset, `next_review` datetime
-- [ ] `POST /api/review/submit` updates `review_progress` + append `review_history`
-- [ ] `GET /api/review/today` — due words + limits + ordering (wrong_count, next_review)
-- [ ] `jobs/review.job.js` — nightly queue generation into `daily_review_queue`
-- [ ] Optional: rating Again/Hard/Good/Easy mapping
+- [x] `review.service.js`: intervals, ease factor, wrong reset, `next_review` datetime
+- [x] `POST /api/review/submit` updates `review_progress` + append `review_history`
+- [x] `GET /api/review/today` — due words + limits + ordering (wrong_count, next_review)
+- [x] `jobs/review.job.js` — nightly queue generation into `daily_review_queue`
+- [x] Optional: rating Again/Hard/Good/Easy mapping
 
 ### Phase F — 3-touch (≈ 1 week)
 

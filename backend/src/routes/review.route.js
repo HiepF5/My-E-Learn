@@ -1,11 +1,8 @@
 const router = require("express").Router();
+const reviewController = require("../controllers/review.controller");
+const { validateSubmitReview } = require("../validators/review.validator");
 
-router.get("/today", (req, res) => {
-  return res.status(200).json({
-    success: true,
-    data: [],
-    message: "Review route protected and ready",
-  });
-});
+router.get("/today", reviewController.getToday);
+router.post("/submit", validateSubmitReview, reviewController.submit);
 
 module.exports = router;

@@ -9,9 +9,23 @@ const authMiddleware = require("./middlewares/auth.middleware");
 const errorMiddleware = require("./middlewares/error.middleware");
 
 const app = express();
+const corsOriginEnv = process.env.CORS_ORIGIN || "*";
+const allowedOrigins = corsOriginEnv
+  .split(",")
+  .map((item) => item.trim())
+  .filter(Boolean);
+const corsOptions =
+  allowedOrigins.length === 1 && allowedOrigins[0] === "*"
+    ? {}
+    : {
+        origin: (origin, callback) => {
+          if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+          return callback(new Error("CORS origin not allowed"));
+        },
+      };
 
 app.use(helmet());
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(morgan("dev"));
 app.use(express.json());
 

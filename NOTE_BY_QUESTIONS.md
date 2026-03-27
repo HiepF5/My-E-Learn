@@ -578,6 +578,36 @@ Muc dich: ghi lai nhung yeu cau ban da giao va nhung gi da duoc tao/sua de de to
 
 ---
 
+## 30) "Chuyen P4 - Deploy nho (Docker Compose + env/CORS)"
+
+- Trang thai: DONE
+- Da lam:
+  - Them deploy baseline bang Docker Compose:
+    - `mysql` (MySQL 8) + volume `mysql_data`
+    - `backend` build tu `backend/Dockerfile`
+  - Backend ho tro CORS theo env:
+    - `CORS_ORIGIN` nhan danh sach domain phan tach boi dau phay
+    - mac dinh `*` cho local
+  - Mo rong env:
+    - `.env.example` them `DB_PORT`, `CORS_ORIGIN`
+    - `database.js` doc `DB_PORT`
+  - Them file deploy:
+    - `docker-compose.yml`
+    - `backend/Dockerfile`
+    - `backend/.dockerignore`
+  - Cap nhat roadmap: tick Deploy trong P4.
+- Files tao/sua:
+  - `docker-compose.yml`
+  - `backend/Dockerfile`
+  - `backend/.dockerignore`
+  - `backend/src/app.js`
+  - `backend/src/config/database.js`
+  - `.env.example`
+  - `.cursor/skills/my-learn-e-project/reference-roadmap.md`
+  - `NOTE_BY_QUESTIONS.md`
+
+---
+
 ## Cach su dung file note nay
 
 - Moi yeu cau moi: them 1 section moi o cuoi file.

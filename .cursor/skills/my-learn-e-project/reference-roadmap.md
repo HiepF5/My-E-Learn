@@ -235,4 +235,4 @@ Các mục **ở trên ưu tiên hơn**; tick khi hoàn thành.
 
 - [ ] **Phase K**: `streak_tracking` + heatmap UI; `weak_word_detector`; `confusion_pairs`; speaking/writing + `ai_feedback`.
 - [ ] **LLM** (sau rule engine): sửa câu / gợi ý — chỉ khi Phase J ổn.
-- [ ] **Deploy**: Docker Compose (MySQL + API), CORS theo domain production, biến môi trường staging/prod.
+- [x] **Deploy**: Docker Compose (MySQL + API), CORS theo domain production, biến môi trường staging/prod.

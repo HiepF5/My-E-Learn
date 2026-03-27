@@ -11,7 +11,8 @@
     "lint": "eslint \"src/**/*.js\"",
     "lint:fix": "eslint \"src/**/*.js\" --fix",
     "format": "prettier \"src/**/*.js\" --write",
-    "format:check": "prettier \"src/**/*.js\" --check"
+    "format:check": "prettier \"src/**/*.js\" --check",
+    "smoke": "node scripts/smoke-test.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

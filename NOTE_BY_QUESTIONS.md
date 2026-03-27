@@ -467,6 +467,29 @@ Muc dich: ghi lai nhung yeu cau ban da giao va nhung gi da duoc tao/sua de de to
 
 ---
 
+## 26) "Tiep tuc roadmap - P2.4 smoke test"
+
+- Trang thai: DONE
+- Da lam:
+  - Them smoke test script backend: `backend/scripts/smoke-test.js`.
+  - Them npm script: `backend/package.json` -> `npm run smoke`.
+  - Smoke test check:
+    - `GET /health`
+    - `GET /api/openapi.json`
+    - Auth checks (optional) neu set `SMOKE_USERNAME` + `SMOKE_PASSWORD`:
+      - `POST /api/auth/login`
+      - `GET /api/topics`
+      - `GET /api/review/today?limit=1`
+  - Da chay `npm run smoke` thanh cong (public checks pass, auth checks skip vi chua set env test user).
+  - Cap nhat roadmap: tick xong P2.4 Smoke test.
+- Files tao/sua:
+  - `backend/scripts/smoke-test.js`
+  - `backend/package.json`
+  - `.cursor/skills/my-learn-e-project/reference-roadmap.md`
+  - `NOTE_BY_QUESTIONS.md`
+
+---
+
 ## Cach su dung file note nay
 
 - Moi yeu cau moi: them 1 section moi o cuoi file.

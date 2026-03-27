@@ -171,7 +171,10 @@ Tech: Riverpod, Dio, optional Hive later.
 
 - [x] No secrets in repo
 - [x] Lint + format on backend/frontend
-- [ ] Smoke test script or Postman collection (optional)
+- [x] Smoke test script or Postman collection (optional)
+  - Script: `backend/scripts/smoke-test.js`
+  - Run: `cd backend && npm run smoke`
+  - Optional auth checks: set `SMOKE_USERNAME` + `SMOKE_PASSWORD` (and optional `SMOKE_BASE_URL`)
 
 ---
 
@@ -219,7 +222,7 @@ Các mục **ở trên ưu tiên hơn**; tick khi hoàn thành.
 - [x] **Quality**: ESLint/Prettier cho `backend` + `web-admin`; tùy chọn `flutter analyze` cho `mobile-app`.
 - [x] **CI**: pipeline chạy lint + build (ít nhất web-admin + backend).
 - [x] **Secrets**: đảm bảo `.env` không vào git; chỉ `.env.example` trong repo.
-- [ ] **Smoke test**: script hoặc Postman/Thunder collection bám OpenAPI (tùy chọn nhưng nên có).
+- [x] **Smoke test**: script hoặc Postman/Thunder collection bám OpenAPI (tùy chọn nhưng nên có).
 
 ### P3 — Tính năng lõi tiếp theo
 

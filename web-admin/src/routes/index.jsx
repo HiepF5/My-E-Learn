@@ -6,6 +6,7 @@ import VocabularyPage from "../pages/VocabularyPage";
 import ReviewPage from "../pages/ReviewPage";
 import ErrorPage from "../pages/ErrorPage";
 import TopicPage from "../pages/TopicPage";
+import StreakPage from "../pages/StreakPage";
 
 const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem("token");
@@ -28,6 +29,7 @@ function AppRoutes() {
         <Route path="/review" element={<ReviewPage />} />
         <Route path="/errors" element={<ErrorPage />} />
         <Route path="/topics" element={<TopicPage />} />
+        <Route path="/streak" element={<StreakPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

@@ -109,7 +109,7 @@ Tech: Riverpod, Dio, optional Hive later.
 
 ### Phase K — Stretch
 
-- [ ] `streak_tracking`, heatmap UI (**backend API done; UI pending**)
+- [x] `streak_tracking`, heatmap UI
 - [ ] `weak_word_detector` table + boosting
 - [ ] `confusion_pairs` / pair confusion boosting
 - [ ] Speaking/writing records, `ai_feedback`
@@ -233,6 +233,6 @@ Các mục **ở trên ưu tiên hơn**; tick khi hoàn thành.
 
 ### P4 — Mở rộng & production
 
-- [ ] **Phase K**: `streak_tracking` + heatmap UI (**backend API done; UI pending**); `weak_word_detector`; `confusion_pairs`; speaking/writing + `ai_feedback`.
+- [ ] **Phase K**: `streak_tracking` + heatmap UI (**done**); `weak_word_detector`; `confusion_pairs`; speaking/writing + `ai_feedback`.
 - [ ] **LLM** (sau rule engine): sửa câu / gợi ý — chỉ khi Phase J ổn.
 - [x] **Deploy**: Docker Compose (MySQL + API), CORS theo domain production, biến môi trường staging/prod.

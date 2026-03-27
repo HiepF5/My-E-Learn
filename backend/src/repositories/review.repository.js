@@ -1,4 +1,4 @@
-const { Op } = require("sequelize");
+const { Op, fn, col } = require("sequelize");
 const ReviewProgress = require("../models/review-progress.model");
 const ReviewHistory = require("../models/review-history.model");
 const DailyReviewQueue = require("../models/daily-review-queue.model");
@@ -64,6 +64,25 @@ const findProgressByUser = (userId, limit = 50) => {
   });
 };
 
+const findAllProgressForUser = (userId, limit = 5000) =>
+  ReviewProgress.findAll({
+    where: { user_id: userId },
+    order: [["wrong_count", "DESC"]],
+    limit,
+  });
+
+const countRecentWrongsByWord = (userId, sinceDate) =>
+  ReviewHistory.findAll({
+    attributes: ["word_id", [fn("COUNT", col("id")), "wrong_cnt"]],
+    where: {
+      user_id: userId,
+      answer_result: false,
+      reviewed_at: { [Op.gte]: sinceDate },
+    },
+    group: ["word_id"],
+    raw: true,
+  });
+
 module.exports = {
   findProgressByUserAndWord,
   createProgress,
@@ -74,4 +93,6 @@ module.exports = {
   createQueueItems,
   findDueRowsForQueue,
   findProgressByUser,
+  findAllProgressForUser,
+  countRecentWrongsByWord,
 };

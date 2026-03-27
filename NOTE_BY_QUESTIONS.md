@@ -668,6 +668,30 @@ Muc dich: ghi lai nhung yeu cau ban da giao va nhung gi da duoc tao/sua de de to
 
 ---
 
+## 34) "Heatmap UI nhe o web-admin cho streak"
+
+- Trang thai: DONE
+- Da lam:
+  - Them trang `StreakPage` o web-admin:
+    - Hien `current_streak`, `best_streak`, `last_study_date`
+    - Hien heatmap grid don gian theo `days` (30/90/180)
+    - Co nut `Check-in Today` goi `POST /api/streak/check-in`
+  - Noi route + menu:
+    - `/streak` trong router
+    - Sidebar item `Streak`
+  - Chay lint web-admin pass.
+  - Cap nhat roadmap:
+    - Tick xong `streak_tracking, heatmap UI`
+    - Phase K tong quan van pending do cac muc con lai chua lam.
+- Files tao/sua:
+  - `web-admin/src/pages/StreakPage.jsx`
+  - `web-admin/src/routes/index.jsx`
+  - `web-admin/src/layouts/AdminLayout.jsx`
+  - `.cursor/skills/my-learn-e-project/reference-roadmap.md`
+  - `NOTE_BY_QUESTIONS.md`
+
+---
+
 ## Cach su dung file note nay
 
 - Moi yeu cau moi: them 1 section moi o cuoi file.

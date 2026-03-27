@@ -6,6 +6,7 @@ import {
   ClockCircleOutlined,
   BugOutlined,
   TagsOutlined,
+  FireOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
 
@@ -21,6 +22,7 @@ const items = [
   { key: "/review", icon: <ClockCircleOutlined />, label: <Link to="/review">Review</Link> },
   { key: "/errors", icon: <BugOutlined />, label: <Link to="/errors">Errors</Link> },
   { key: "/topics", icon: <TagsOutlined />, label: <Link to="/topics">Topics</Link> },
+  { key: "/streak", icon: <FireOutlined />, label: <Link to="/streak">Streak</Link> },
 ];
 
 function AdminLayout() {

@@ -19,6 +19,7 @@ tags:
   - name: Errors
   - name: AI
   - name: Streak
+  - name: Weak words
 paths:
   /health:
     get:
@@ -853,6 +854,38 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
+  /api/weak-words:
+    get:
+      tags: [Weak words]
+      summary: List weak words (recomputed from progress and recent wrong answers)
+      description: |
+        Recomputes per-user weak scores from review progress (`wrong_count`, `correct_count`)
+        and wrong answers in `review_history` for the last 14 days, persists snapshots to
+        `weak_word_detector`, then returns the top items by score.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 30
+          description: Max number of weak words to return
+      responses:
+        "200":
+          description: Weak words list ordered by weak_score descending
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WeakWordsListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
 components:
   securitySchemes:
     bearerAuth:
@@ -976,6 +1009,46 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/StreakHeatmapItem"
+        message:
+          type: string
+      required: [success, data, message]
+
+    WeakWordItem:
+      type: object
+      properties:
+        word_id:
+          type: integer
+        weak_score:
+          type: number
+          format: float
+        wrong_count_snapshot:
+          type: integer
+        correct_count_snapshot:
+          type: integer
+        recent_wrong_count:
+          type: integer
+          description: Wrong answers in review_history in the last 14 days
+        last_computed_at:
+          type: string
+          format: date-time
+      required:
+        - word_id
+        - weak_score
+        - wrong_count_snapshot
+        - correct_count_snapshot
+        - recent_wrong_count
+        - last_computed_at
+
+    WeakWordsListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/WeakWordItem"
         message:
           type: string
       required: [success, data, message]

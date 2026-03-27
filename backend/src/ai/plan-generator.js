@@ -28,6 +28,7 @@ const buildTodayPlan = ({
   topErrors,
   progressRows,
   weakWords = [],
+  confusedWordIds = [],
   dailyTargetWords = 10,
   reviewCap = 30,
 }) => {
@@ -38,9 +39,16 @@ const buildTodayPlan = ({
   const falseMasterIds = ranked.filter(isFalseMaster).map((p) => p.word_id);
   // Weak-word IDs are recomputed using weak_score (includes recent mistakes from review_history),
   // so the rule engine can boost words that are currently failing recently.
-  const weakWordIds = Array.isArray(weakWords) && weakWords.length
+  const primaryWeakWordIds = Array.isArray(weakWords) && weakWords.length
     ? weakWords.slice(0, 15).map((w) => Number(w.word_id))
     : ranked.slice(0, 15).map((p) => p.word_id);
+
+  // Pair confusion boost: prioritize words the learner repeatedly selects when answering incorrectly.
+  const boostedConfusedWordIds = Array.isArray(confusedWordIds) && confusedWordIds.length
+    ? confusedWordIds.slice(0, 15).map((wid) => Number(wid))
+    : [];
+
+  const weakWordIds = Array.from(new Set([...primaryWeakWordIds, ...boostedConfusedWordIds])).slice(0, 15);
 
   const priorityPreview = ranked.slice(0, 8).map((p) => ({
     word_id: p.word_id,

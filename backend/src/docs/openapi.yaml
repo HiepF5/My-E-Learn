@@ -1563,6 +1563,12 @@ components:
           type: integer
         answer_result:
           type: boolean
+        selected_word_id:
+          type: integer
+          description: >
+            Optional. When `answer_result=false`, this is the word the learner selected
+            (the "confused" word). Used for pair-confusion boosting in Phase K.
+          nullable: true
         response_time_ms:
           type: integer
           description: >

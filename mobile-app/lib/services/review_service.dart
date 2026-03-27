@@ -23,16 +23,41 @@ class ReviewService {
     }
   }
 
+  Future<Map<int, String>> getVocabularyWordMapByIds(List<int> ids) async {
+    if (ids.isEmpty) return {};
+    try {
+      final uniqueIds = ids.toSet();
+      final res = await _apiClient.dio.get('/vocabulary');
+      final raw = (res.data['data'] as List<dynamic>? ?? []);
+      final map = <int, String>{};
+
+      for (final item in raw) {
+        final row = (item as Map).cast<String, dynamic>();
+        final id = (row['id'] as num?)?.toInt();
+        if (id == null || !uniqueIds.contains(id)) continue;
+        final word = (row['word'] as String?)?.trim();
+        map[id] = (word == null || word.isEmpty) ? 'Word #$id' : word;
+      }
+      return map;
+    } catch (_) {
+      return {};
+    }
+  }
+
   Future<void> submitReview({
     required int wordId,
     required bool answerResult,
     required String rating,
+    int? selectedWordId,
   }) async {
     final payload = {
       'word_id': wordId,
       'answer_result': answerResult,
       'rating': rating,
     };
+    if (selectedWordId != null) {
+      payload['selected_word_id'] = selectedWordId;
+    }
 
     try {
       await _apiClient.dio.post('/review/submit', data: payload);

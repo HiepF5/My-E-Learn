@@ -12,6 +12,9 @@ const ReviewHistory = sequelize.define(
     user_id: { type: DataTypes.BIGINT.UNSIGNED, allowNull: false },
     word_id: { type: DataTypes.BIGINT.UNSIGNED, allowNull: false },
     answer_result: { type: DataTypes.BOOLEAN, allowNull: false },
+    // When `answer_result=false`, this is the word the learner selected instead of `word_id`.
+    // Used for "pair confusion" boosting in Phase K.
+    selected_word_id: { type: DataTypes.BIGINT.UNSIGNED, allowNull: true },
     response_time_ms: { type: DataTypes.INTEGER, allowNull: true },
     review_mode: { type: DataTypes.STRING(50), allowNull: true },
     reviewed_at: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },

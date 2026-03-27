@@ -83,6 +83,21 @@ const countRecentWrongsByWord = (userId, sinceDate) =>
     raw: true,
   });
 
+// For pair-confusion boosting: count "wrong selections" in last window,
+// grouped by the word the learner selected instead of the target `word_id`.
+const countRecentWrongSelectionsByWord = (userId, sinceDate) =>
+  ReviewHistory.findAll({
+    attributes: ["selected_word_id", [fn("COUNT", col("id")), "wrong_selection_cnt"]],
+    where: {
+      user_id: userId,
+      answer_result: false,
+      selected_word_id: { [Op.ne]: null },
+      reviewed_at: { [Op.gte]: sinceDate },
+    },
+    group: ["selected_word_id"],
+    raw: true,
+  });
+
 module.exports = {
   findProgressByUserAndWord,
   createProgress,
@@ -95,4 +110,5 @@ module.exports = {
   findProgressByUser,
   findAllProgressForUser,
   countRecentWrongsByWord,
+  countRecentWrongSelectionsByWord,
 };

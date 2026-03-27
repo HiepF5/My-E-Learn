@@ -20,6 +20,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
   bool _loading = true;
   TouchHistoryItem? _touch;
   bool _submittingTouch = false;
+  Map<int, String> _wordLabelById = const {};
 
   @override
   void initState() {
@@ -30,6 +31,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
   Future<void> _load() async {
     final service = ReviewService(ref.read(apiClientProvider), CacheService());
     final data = await service.getTodayReview(limit: 20);
+    final wordMap = await service.getVocabularyWordMapByIds(data.map((e) => e.wordId).toList());
     TouchHistoryItem? touch;
     if (data.isNotEmpty) {
       touch = await service.getTouchHistory(data.first.wordId);
@@ -37,6 +39,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
     if (!mounted) return;
     setState(() {
       _items = data;
+      _wordLabelById = wordMap;
       _touch = touch;
       _loading = false;
       _index = 0;
@@ -71,13 +74,76 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
     if (_items.isEmpty || _index >= _items.length) return;
     final current = _items[_index];
     final service = ReviewService(ref.read(apiClientProvider), CacheService());
-    await service.submitReview(wordId: current.wordId, answerResult: correct, rating: rating);
+    int? selectedWordId;
+    if (!correct) {
+      selectedWordId = await _askSelectedWordId();
+      if (selectedWordId == null) return;
+    }
+    await service.submitReview(
+      wordId: current.wordId,
+      answerResult: correct,
+      rating: rating,
+      selectedWordId: selectedWordId,
+    );
     if (!mounted) return;
     setState(() {
       _index += 1;
       _touch = null;
     });
     await _loadTouchForCurrent();
+  }
+
+  Future<int?> _askSelectedWordId() async {
+    final currentWordId = _items[_index].wordId;
+    final optionIds = _items
+        .map((e) => e.wordId)
+        .where((wid) => wid != currentWordId)
+        .toSet()
+        .toList();
+
+    if (optionIds.isEmpty) return null;
+
+    final result = await showDialog<int>(
+      context: context,
+      builder: (ctx) {
+        int? selectedId;
+        return StatefulBuilder(
+          builder: (dialogContext, setDialogState) => AlertDialog(
+            title: const Text('Ban da chon nham tu nao?'),
+            content: SizedBox(
+              width: 360,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: optionIds
+                      .map(
+                        (wid) => RadioListTile<int>(
+                          value: wid,
+                          groupValue: selectedId,
+                          onChanged: (value) => setDialogState(() => selectedId = value),
+                          title: Text(_wordLabelById[wid] ?? 'Word #$wid'),
+                          subtitle: Text('ID: $wid'),
+                        ),
+                      )
+                      .toList(),
+                ),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: const Text('Cancel'),
+              ),
+              FilledButton(
+                onPressed: selectedId == null ? null : () => Navigator.of(ctx).pop(selectedId),
+                child: const Text('Submit'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+    return result;
   }
 
   int _currentTouchStep(TouchHistoryItem? touch) {
@@ -116,6 +182,11 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                 child: Column(
                   children: [
                     Text('Word ID: ${item.wordId}', style: Theme.of(context).textTheme.headlineSmall),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Word: ${_wordLabelById[item.wordId] ?? "-"}',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
                     const SizedBox(height: 8),
                     Text('Level: ${item.level}, Wrong: ${item.wrongCount}'),
                     const SizedBox(height: 12),

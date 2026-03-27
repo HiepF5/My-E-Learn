@@ -19,6 +19,7 @@ const submit = async (req, res, next) => {
       userId: req.user.userId,
       wordId: req.body.word_id,
       answerResult: req.body.answer_result,
+      selectedWordId: req.body.selected_word_id,
       responseTimeMs: req.body.response_time_ms,
       reviewMode: req.body.review_mode,
       rating: req.body.rating,

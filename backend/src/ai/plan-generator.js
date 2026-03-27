@@ -27,6 +27,7 @@ const buildTodayPlan = ({
   wordCounts,
   topErrors,
   progressRows,
+  weakWords = [],
   dailyTargetWords = 10,
   reviewCap = 30,
 }) => {
@@ -35,7 +36,11 @@ const buildTodayPlan = ({
 
   const ranked = rankProgress(progressRows);
   const falseMasterIds = ranked.filter(isFalseMaster).map((p) => p.word_id);
-  const weakWordIds = ranked.slice(0, 15).map((p) => p.word_id);
+  // Weak-word IDs are recomputed using weak_score (includes recent mistakes from review_history),
+  // so the rule engine can boost words that are currently failing recently.
+  const weakWordIds = Array.isArray(weakWords) && weakWords.length
+    ? weakWords.slice(0, 15).map((w) => Number(w.word_id))
+    : ranked.slice(0, 15).map((p) => p.word_id);
 
   const priorityPreview = ranked.slice(0, 8).map((p) => ({
     word_id: p.word_id,

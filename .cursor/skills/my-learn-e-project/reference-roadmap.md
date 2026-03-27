@@ -110,7 +110,7 @@ Tech: Riverpod, Dio, optional Hive later.
 ### Phase K — Stretch
 
 - [x] `streak_tracking`, heatmap UI
-- [ ] `weak_word_detector` table + boosting
+- [x] `weak_word_detector` table + boosting
 - [ ] `confusion_pairs` / pair confusion boosting
 - [ ] Speaking/writing records, `ai_feedback`
 - [ ] LLM sentence correction (Phase 2+)

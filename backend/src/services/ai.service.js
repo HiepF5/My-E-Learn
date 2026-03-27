@@ -3,13 +3,15 @@ const vocabularyRepository = require("../repositories/vocabulary.repository");
 const errorRepository = require("../repositories/error.repository");
 const reviewRepository = require("../repositories/review.repository");
 const { buildTodayPlan } = require("../ai/plan-generator");
+const weakWordService = require("./weak-word.service");
 
 const generateTodayPlan = async (userId, payload = {}) => {
-  const [topics, wordCounts, topErrors, progressRows] = await Promise.all([
+  const [topics, wordCounts, topErrors, progressRows, weakWords] = await Promise.all([
     topicRepository.listTopics(),
     vocabularyRepository.countWordsPerTopic(),
     errorRepository.topRepeatedErrors(userId, 20),
     reviewRepository.findProgressByUser(userId, 80),
+    weakWordService.listWeakWords(userId, 15),
   ]);
 
   const plan = buildTodayPlan({
@@ -17,6 +19,7 @@ const generateTodayPlan = async (userId, payload = {}) => {
     wordCounts,
     topErrors,
     progressRows,
+    weakWords,
     dailyTargetWords: payload.daily_target_words,
     reviewCap: payload.review_cap,
   });

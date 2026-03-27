@@ -608,6 +608,66 @@ Muc dich: ghi lai nhung yeu cau ban da giao va nhung gi da duoc tao/sua de de to
 
 ---
 
+## 31) "Them README runbook ngan (local vs docker, migrate, troubleshoot DB)"
+
+- Trang thai: DONE
+- Da lam:
+  - Them runbook ngan tai `README.md` o root repo.
+  - Co day du 4 phan:
+    - Local run (backend + MySQL host)
+    - Docker run (`docker compose up --build -d`)
+    - Migrate commands (local + docker)
+    - Troubleshooting DB (access denied, DB not ready, port conflict)
+- Files tao/sua:
+  - `README.md`
+  - `NOTE_BY_QUESTIONS.md`
+
+---
+
+## 32) "Kiem tra cac task trong reference-roadmap"
+
+- Trang thai: DONE
+- Da lam:
+  - Doi chieu roadmap voi code hien tai.
+  - Xac nhan Phase A->J, P1->P3, va Deploy da hoan thanh.
+  - Chinh 1 task lech trang thai:
+    - `MySQL 8+ local or Docker` => tick `[x]` (da co `docker-compose.yml`).
+- Files tao/sua:
+  - `.cursor/skills/my-learn-e-project/reference-roadmap.md`
+  - `NOTE_BY_QUESTIONS.md`
+
+---
+
+## 33) "Lam tiep roadmap - Phase K (streak backend foundation)"
+
+- Trang thai: DONE (backend), UI pending
+- Da lam:
+  - Them migration table `streak_tracking`:
+    - unique `(user_id, study_date)`
+  - Them backend module day du:
+    - model/repository/service/controller/validator/route
+  - Them API:
+    - `GET /api/streak/current`
+    - `POST /api/streak/check-in`
+    - `GET /api/streak/heatmap?days=90`
+  - Gan route vao `app.js` (co JWT middleware).
+  - Cap nhat OpenAPI cho Streak endpoints + schemas.
+  - Cap nhat roadmap: danh dau ro `streak_tracking` backend da xong, heatmap UI con pending.
+- Files tao/sua:
+  - `database/migrations/20260328120000-add-streak-tracking.js`
+  - `backend/src/models/streak-tracking.model.js`
+  - `backend/src/repositories/streak.repository.js`
+  - `backend/src/services/streak.service.js`
+  - `backend/src/controllers/streak.controller.js`
+  - `backend/src/validators/streak.validator.js`
+  - `backend/src/routes/streak.route.js`
+  - `backend/src/app.js`
+  - `backend/src/docs/openapi.yaml`
+  - `.cursor/skills/my-learn-e-project/reference-roadmap.md`
+  - `NOTE_BY_QUESTIONS.md`
+
+---
+
 ## Cach su dung file note nay
 
 - Moi yeu cau moi: them 1 section moi o cuoi file.

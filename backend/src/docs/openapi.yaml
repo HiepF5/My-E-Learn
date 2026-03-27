@@ -18,6 +18,7 @@ tags:
   - name: Review
   - name: Errors
   - name: AI
+  - name: Streak
 paths:
   /health:
     get:
@@ -792,6 +793,66 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
+  /api/streak/current:
+    get:
+      tags: [Streak]
+      summary: Get current and best streak
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Current streak summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StreakCurrentResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/streak/check-in:
+    post:
+      tags: [Streak]
+      summary: Mark today's study check-in
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Check-in saved and streak recalculated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StreakCurrentResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/streak/heatmap:
+    get:
+      tags: [Streak]
+      summary: Get streak heatmap activity by date
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: days
+          required: false
+          schema:
+            type: integer
+            minimum: 7
+            maximum: 365
+            default: 90
+          description: Number of days to include in heatmap
+      responses:
+        "200":
+          description: Heatmap activity list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StreakHeatmapResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
 components:
   securitySchemes:
     bearerAuth:
@@ -870,6 +931,55 @@ components:
             $ref: "#/components/schemas/ErrorResponse"
 
   schemas:
+    StreakCurrent:
+      type: object
+      properties:
+        current_streak:
+          type: integer
+        best_streak:
+          type: integer
+        last_study_date:
+          type: string
+          format: date
+          nullable: true
+      required: [current_streak, best_streak]
+
+    StreakCurrentResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: "#/components/schemas/StreakCurrent"
+        message:
+          type: string
+      required: [success, data, message]
+
+    StreakHeatmapItem:
+      type: object
+      properties:
+        study_date:
+          type: string
+          format: date
+        did_study:
+          type: boolean
+      required: [study_date, did_study]
+
+    StreakHeatmapResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/StreakHeatmapItem"
+        message:
+          type: string
+      required: [success, data, message]
+
     GenerateTodayPlanRequest:
       type: object
       properties:

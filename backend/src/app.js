@@ -42,6 +42,7 @@ app.use("/api/topics", authMiddleware, require("./routes/topic.route"));
 app.use("/api/review", authMiddleware, require("./routes/review.route"));
 app.use("/api/errors", authMiddleware, require("./routes/error.route"));
 app.use("/api/ai", authMiddleware, require("./routes/ai.route"));
+app.use("/api/streak", authMiddleware, require("./routes/streak.route"));
 
 app.get("/health", (req, res) => {
   res.status(200).json({

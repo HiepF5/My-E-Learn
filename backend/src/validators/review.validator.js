@@ -1,7 +1,10 @@
-const ALLOWED_RATINGS = ["Again", "Hard", "Good", "Easy"];
+const {
+  ALLOWED_RATINGS,
+  ALLOWED_REVIEW_MODES,
+} = require("../constants/review.constants");
 
 const validateSubmitReview = (req, res, next) => {
-  const { word_id, answer_result, response_time_ms, rating } = req.body || {};
+  const { word_id, answer_result, response_time_ms, rating, review_mode } = req.body || {};
 
   if (!Number.isInteger(word_id) || word_id <= 0) {
     return res.status(400).json({
@@ -35,6 +38,14 @@ const validateSubmitReview = (req, res, next) => {
       success: false,
       data: null,
       message: "rating must be one of Again, Hard, Good, Easy",
+    });
+  }
+
+  if (review_mode !== undefined && !ALLOWED_REVIEW_MODES.includes(review_mode)) {
+    return res.status(400).json({
+      success: false,
+      data: null,
+      message: `review_mode must be one of ${ALLOWED_REVIEW_MODES.join(", ")}`,
     });
   }
 

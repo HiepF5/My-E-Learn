@@ -421,8 +421,11 @@ paths:
             type: integer
             minimum: 1
             maximum: 100
+            default: 30
           required: false
-          description: Max number of due review items
+          description: >
+            Daily cap for due review items. If omitted, server uses 30.
+            Values outside 1..100 are clamped to the nearest valid value.
       responses:
         "200":
           description: Due review items ordered by wrong_count and next_review
@@ -1250,8 +1253,13 @@ components:
           type: boolean
         response_time_ms:
           type: integer
+          description: >
+            Optional response time in milliseconds.
+            When provided for correct answers, server applies a small ease-factor
+            adjustment (+0.03 for fast <= 2500ms, -0.03 for slow >= 15000ms).
         review_mode:
           type: string
+          enum: [recognize, type, sentence, flashcard]
         rating:
           type: string
           enum: [Again, Hard, Good, Easy]

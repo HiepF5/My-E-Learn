@@ -151,7 +151,7 @@ Tech: Riverpod, Dio, optional Hive later.
 - [x] `routes/topics.route.js` (implemented as `routes/topic.route.js`)
 - [x] Matching controllers, services, repositories
 - [x] `validators/` for each resource
-- [ ] `constants/` intervals, review modes enum
+- [x] `constants/` intervals, review modes enum
 
 ### Review domain
 
@@ -226,7 +226,7 @@ Các mục **ở trên ưu tiên hơn**; tick khi hoàn thành.
 
 ### P3 — Tính năng lõi tiếp theo
 
-- [ ] **Review**: daily cap rõ ràng (ví dụ max 20–30) + tài liệu hành vi; (tuỳ chọn) hook `response_time_ms` trong thuật toán.
+- [x] **Review**: daily cap rõ ràng (ví dụ max 20–30) + tài liệu hành vi; (tuỳ chọn) hook `response_time_ms` trong thuật toán.
 - [ ] **Phase J**: `backend/src/ai/` rule-based (priority, false-master, error patterns) + `POST /api/ai/generate-today-plan` + OpenAPI.
 - [ ] **Mobile**: màn **3-touch** thật (Recognize → Type → Sentence) gọi `/api/review/touch/...`; queue sync khi có mạng.
 

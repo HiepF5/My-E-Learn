@@ -490,6 +490,34 @@ Muc dich: ghi lai nhung yeu cau ban da giao va nhung gi da duoc tao/sua de de to
 
 ---
 
+## 27) "Tiep tuc roadmap - P3.1 review cap va behavior"
+
+- Trang thai: DONE
+- Da lam:
+  - Tao constants review: `backend/src/constants/review.constants.js`
+    - `REVIEW_LIMIT` (default=30, min=1, max=100)
+    - `INTERVALS`, `RATING_MAP`
+    - `ALLOWED_RATINGS`, `ALLOWED_REVIEW_MODES`
+  - Refactor `review.service.js` su dung constants de minh bach daily cap.
+  - Bo sung optional hook `response_time_ms` vao tinh ease factor:
+    - correct <= 2500ms: `+0.03`
+    - correct >= 15000ms: `-0.03`
+  - Cap nhat `review.validator.js` validate `review_mode` theo enum.
+  - Cap nhat OpenAPI:
+    - `GET /api/review/today` mo ta daily cap + default 30 + behavior clamp 1..100
+    - `ReviewSubmitRequest.review_mode` enum
+    - `ReviewSubmitRequest.response_time_ms` behavior note
+  - Cap nhat roadmap: tick xong P3.1 va checklist constants.
+- Files tao/sua:
+  - `backend/src/constants/review.constants.js`
+  - `backend/src/services/review.service.js`
+  - `backend/src/validators/review.validator.js`
+  - `backend/src/docs/openapi.yaml`
+  - `.cursor/skills/my-learn-e-project/reference-roadmap.md`
+  - `NOTE_BY_QUESTIONS.md`
+
+---
+
 ## Cach su dung file note nay
 
 - Moi yeu cau moi: them 1 section moi o cuoi file.

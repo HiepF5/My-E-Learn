@@ -1,17 +1,26 @@
 const sequelize = require("../config/database");
 const reviewRepository = require("../repositories/review.repository");
-
-const INTERVALS = [1, 3, 7, 14, 30, 60, 120];
-const RATING_MAP = {
-  Again: { levelDelta: -999, multiplier: 0, easeDelta: -0.2, forceInterval: 1 },
-  Hard: { levelDelta: 0, multiplier: 0.7, easeDelta: -0.05 },
-  Good: { levelDelta: 1, multiplier: 1, easeDelta: 0 },
-  Easy: { levelDelta: 2, multiplier: 1.3, easeDelta: 0.1 },
-};
+const {
+  REVIEW_LIMIT,
+  INTERVALS,
+  RATING_MAP,
+} = require("../constants/review.constants");
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
-const calculateNextReview = ({ level, easeFactor, answerResult, rating }) => {
+const applyResponseTimeAdjustment = (easeFactor, responseTimeMs, answerResult) => {
+  if (!answerResult || !Number.isInteger(responseTimeMs) || responseTimeMs < 0) {
+    return easeFactor;
+  }
+
+  // Optional lightweight hook: fast correct answers slightly increase ease,
+  // very slow correct answers slightly decrease ease.
+  if (responseTimeMs <= 2500) return clamp(easeFactor + 0.03, 1.3, 3.5);
+  if (responseTimeMs >= 15000) return clamp(easeFactor - 0.03, 1.3, 3.5);
+  return easeFactor;
+};
+
+const calculateNextReview = ({ level, easeFactor, answerResult, rating, responseTimeMs }) => {
   if (!answerResult) {
     return {
       level: 1,
@@ -23,7 +32,8 @@ const calculateNextReview = ({ level, easeFactor, answerResult, rating }) => {
   const ratingRule = RATING_MAP[rating] || RATING_MAP.Good;
   const nextLevel = clamp(level + ratingRule.levelDelta, 1, INTERVALS.length - 1);
   const baseInterval = INTERVALS[nextLevel];
-  const nextEase = clamp(easeFactor + ratingRule.easeDelta, 1.3, 3.5);
+  const ratedEase = clamp(easeFactor + ratingRule.easeDelta, 1.3, 3.5);
+  const nextEase = applyResponseTimeAdjustment(ratedEase, responseTimeMs, answerResult);
   const intervalDays =
     ratingRule.forceInterval || Math.max(1, Math.round(baseInterval * nextEase * ratingRule.multiplier));
 
@@ -34,8 +44,8 @@ const calculateNextReview = ({ level, easeFactor, answerResult, rating }) => {
   };
 };
 
-const getTodayReview = async (userId, limit = 30) => {
-  const safeLimit = clamp(Number(limit) || 30, 1, 100);
+const getTodayReview = async (userId, limit = REVIEW_LIMIT.DEFAULT) => {
+  const safeLimit = clamp(Number(limit) || REVIEW_LIMIT.DEFAULT, REVIEW_LIMIT.MIN, REVIEW_LIMIT.MAX);
   return reviewRepository.findTodayDueReviews(userId, safeLimit);
 };
 
@@ -70,6 +80,7 @@ const submitReview = async ({
       easeFactor: Number(progress.ease_factor),
       answerResult,
       rating,
+      responseTimeMs,
     });
 
     progress.level = next.level;

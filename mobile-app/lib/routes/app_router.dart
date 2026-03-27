@@ -26,6 +26,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/summary', builder: (_, __) => const DailySummaryScreen()),
     ],
     redirect: (context, state) {
+      if (!auth.isReady) return '/splash';
       final isAuth = auth.isLoggedIn;
       final onSplash = state.fullPath == '/splash';
       final onLogin = state.fullPath == '/login';

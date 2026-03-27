@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/auth_provider.dart';
+import '../../services/cache_service.dart';
+import '../../services/error_service.dart';
 import '../../widgets/app_bottom_nav.dart';
 
 class ErrorNotebookScreen extends ConsumerStatefulWidget {
@@ -22,10 +24,11 @@ class _ErrorNotebookScreenState extends ConsumerState<ErrorNotebookScreen> {
 
   Future<void> _load() async {
     final api = ref.read(apiClientProvider);
-    final res = await api.dio.get('/errors');
+    final service = ErrorService(api, CacheService());
+    final data = await service.getErrors();
     if (!mounted) return;
     setState(() {
-      _items = (res.data['data'] as List<dynamic>? ?? []);
+      _items = data;
       _loading = false;
     });
   }

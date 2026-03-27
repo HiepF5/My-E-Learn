@@ -375,6 +375,39 @@ Muc dich: ghi lai nhung yeu cau ban da giao va nhung gi da duoc tao/sua de de to
 
 ---
 
+## 20) "Productionize mobile (secure token + flavor env + Hive cache)"
+
+- Trang thai: DONE
+- Da lam:
+  - Them secure token persistence bang `flutter_secure_storage`.
+  - Auth bootstrap luc app start: tu dong doc token, set Bearer token, giu session.
+  - Them API base URL theo build flavor qua `--dart-define`:
+    `API_BASE_URL`.
+  - Them Hive offline cache fallback cho:
+    - review queue (`review_today`)
+    - error notebook (`errors_list`)
+  - Chinh router redirect de doi auth bootstrap (`isReady`) truoc khi dieu huong.
+  - Cap nhat roadmap them dong Phase I+ productionize da hoan thanh.
+- Files tao/sua:
+  - `mobile-app/pubspec.yaml`
+  - `mobile-app/lib/config/app_env.dart`
+  - `mobile-app/lib/services/secure_storage_service.dart`
+  - `mobile-app/lib/services/cache_service.dart`
+  - `mobile-app/lib/services/api_client.dart`
+  - `mobile-app/lib/providers/auth_provider.dart`
+  - `mobile-app/lib/services/review_service.dart`
+  - `mobile-app/lib/services/error_service.dart`
+  - `mobile-app/lib/routes/app_router.dart`
+  - `mobile-app/lib/main.dart`
+  - `mobile-app/lib/screens/splash/splash_screen.dart`
+  - `mobile-app/lib/screens/home/home_screen.dart`
+  - `mobile-app/lib/screens/review/review_screen.dart`
+  - `mobile-app/lib/screens/error_note/error_notebook_screen.dart`
+  - `mobile-app/lib/screens/profile/profile_screen.dart`
+  - `.cursor/skills/my-learn-e-project/reference-roadmap.md`
+
+---
+
 ## Cach su dung file note nay
 
 - Moi yeu cau moi: them 1 section moi o cuoi file.

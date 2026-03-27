@@ -99,6 +99,7 @@ Tech: Riverpod, Dio, optional Hive later.
 - [x] Week 3 scaffold: 3-touch review guidance screen
 - [x] Week 4 scaffold: error notebook screen
 - [x] Week 5 scaffold: topic + daily summary screen
+- [x] Phase I+ productionize: secure token persistence, API base URL via flavor, Hive offline cache fallback
 
 ### Phase J — AI rule engine (≈ 2+ weeks, after core stable)
 

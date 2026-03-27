@@ -1,10 +1,11 @@
 import 'package:dio/dio.dart';
+import '../config/app_env.dart';
 
 class ApiClient {
   ApiClient()
       : dio = Dio(
           BaseOptions(
-            baseUrl: 'http://localhost:5000/api',
+            baseUrl: AppEnv.apiBaseUrl,
             connectTimeout: const Duration(seconds: 10),
             receiveTimeout: const Duration(seconds: 15),
           ),

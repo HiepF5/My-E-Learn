@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/auth_provider.dart';
+import '../../services/cache_service.dart';
 import '../../services/review_service.dart';
 import '../../widgets/app_bottom_nav.dart';
 import '../../widgets/today_progress_card.dart';
@@ -24,7 +25,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Future<void> _load() async {
     final api = ref.read(apiClientProvider);
-    final service = ReviewService(api);
+    final service = ReviewService(api, CacheService());
     try {
       final list = await service.getTodayReview(limit: 20);
       if (!mounted) return;

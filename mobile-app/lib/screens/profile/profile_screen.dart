@@ -20,8 +20,9 @@ class ProfileScreen extends ConsumerWidget {
             Text('Username: ${auth.username ?? '-'}'),
             const SizedBox(height: 12),
             FilledButton(
-              onPressed: () {
-                ref.read(authProvider.notifier).logout();
+              onPressed: () async {
+                await ref.read(authProvider.notifier).logout();
+                if (!context.mounted) return;
                 context.go('/login');
               },
               child: const Text('Logout'),

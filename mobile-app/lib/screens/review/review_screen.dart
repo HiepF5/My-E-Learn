@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/review_item.dart';
 import '../../providers/auth_provider.dart';
+import '../../services/cache_service.dart';
 import '../../services/review_service.dart';
 import '../../widgets/app_bottom_nav.dart';
 
@@ -24,7 +25,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
   }
 
   Future<void> _load() async {
-    final service = ReviewService(ref.read(apiClientProvider));
+    final service = ReviewService(ref.read(apiClientProvider), CacheService());
     final data = await service.getTodayReview(limit: 20);
     if (!mounted) return;
     setState(() {
@@ -37,7 +38,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
   Future<void> _rate(String rating, bool correct) async {
     if (_items.isEmpty || _index >= _items.length) return;
     final current = _items[_index];
-    final service = ReviewService(ref.read(apiClientProvider));
+    final service = ReviewService(ref.read(apiClientProvider), CacheService());
     await service.submitReview(wordId: current.wordId, answerResult: correct, rating: rating);
     if (!mounted) return;
     setState(() => _index += 1);

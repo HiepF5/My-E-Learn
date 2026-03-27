@@ -229,7 +229,7 @@ Các mục **ở trên ưu tiên hơn**; tick khi hoàn thành.
 
 - [x] **Review**: daily cap rõ ràng (ví dụ max 20–30) + tài liệu hành vi; (tuỳ chọn) hook `response_time_ms` trong thuật toán.
 - [x] **Phase J**: `backend/src/ai/` rule-based (priority, false-master, error patterns) + `POST /api/ai/generate-today-plan` + OpenAPI.
-- [ ] **Mobile**: màn **3-touch** thật (Recognize → Type → Sentence) gọi `/api/review/touch/...`; queue sync khi có mạng.
+- [x] **Mobile**: màn **3-touch** thật (Recognize → Type → Sentence) gọi `/api/review/touch/...`; queue sync khi có mạng.
 
 ### P4 — Mở rộng & production
 

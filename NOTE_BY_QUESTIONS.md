@@ -552,6 +552,32 @@ Muc dich: ghi lai nhung yeu cau ban da giao va nhung gi da duoc tao/sua de de to
 
 ---
 
+## 29) "Tiep tuc roadmap - P3.3 mobile 3-touch that"
+
+- Trang thai: DONE
+- Da lam:
+  - Cap nhat `ReviewScreen` thanh flow 3-touch that:
+    - Step 1: Recognize
+    - Step 2: Type
+    - Step 3: Sentence
+  - Goi backend touch API:
+    - `GET /api/review/touch/:wordId`
+    - `PATCH /api/review/touch/:wordId`
+  - Chi cho phep cham diem `Again/Hard/Good/Easy` sau khi xong ca 3 step.
+  - Them queue sync khi offline/online trong `ReviewService`:
+    - pending `review/submit`
+    - pending `review/touch` patch
+    - auto sync khi load `getTodayReview`.
+  - Cap nhat roadmap tick xong P3 mobile.
+- Files tao/sua:
+  - `mobile-app/lib/models/touch_history_item.dart`
+  - `mobile-app/lib/services/review_service.dart`
+  - `mobile-app/lib/screens/review/review_screen.dart`
+  - `.cursor/skills/my-learn-e-project/reference-roadmap.md`
+  - `NOTE_BY_QUESTIONS.md`
+
+---
+
 ## Cach su dung file note nay
 
 - Moi yeu cau moi: them 1 section moi o cuoi file.

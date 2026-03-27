@@ -22,3 +22,9 @@ alwaysApply: true
 - Execute the task.
 - Mark the completed item.
 - Report status and next pending item (if any).
+
+## API Documentation Rule
+
+- Whenever creating or changing an API endpoint, update OpenAPI 3.0 spec in backend docs.
+- Keep Swagger UI available and synced with the latest OpenAPI spec.
+- Do not consider an API task complete until implementation and API docs are both updated.

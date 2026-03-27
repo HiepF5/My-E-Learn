@@ -1,0 +1,452 @@
+openapi: 3.0.3
+info:
+  title: MY LEARN E API
+  version: 1.0.0
+  description: Backend API documentation for MY LEARN E.
+servers:
+  - url: http://localhost:5000
+tags:
+  - name: Health
+  - name: Auth
+  - name: Vocabulary
+  - name: Review
+  - name: Errors
+paths:
+  /health:
+    get:
+      tags: [Health]
+      summary: Health check
+      responses:
+        "200":
+          description: Server is running
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessHealth"
+
+  /api/auth/register:
+    post:
+      tags: [Auth]
+      summary: Register new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      responses:
+        "201":
+          description: User registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegisterResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /api/auth/login:
+    post:
+      tags: [Auth]
+      summary: Login and get JWT token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/vocabulary:
+    get:
+      tags: [Vocabulary]
+      summary: List vocabulary
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Vocabulary list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VocabularyListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      tags: [Vocabulary]
+      summary: Create vocabulary
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VocabularyUpsertRequest"
+      responses:
+        "201":
+          description: Vocabulary created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VocabularyItemResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/vocabulary/{id}:
+    get:
+      tags: [Vocabulary]
+      summary: Get vocabulary by id
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/VocabularyId"
+      responses:
+        "200":
+          description: Vocabulary detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VocabularyItemResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags: [Vocabulary]
+      summary: Update vocabulary by id
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/VocabularyId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VocabularyUpsertRequest"
+      responses:
+        "200":
+          description: Vocabulary updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VocabularyItemResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [Vocabulary]
+      summary: Delete vocabulary by id
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/VocabularyId"
+      responses:
+        "200":
+          description: Vocabulary deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessMessageOnly"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/review/today:
+    get:
+      tags: [Review]
+      summary: Review queue for today
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Review route placeholder
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessArray"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/errors:
+    get:
+      tags: [Errors]
+      summary: Error notebook list
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Error route placeholder
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessArray"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    VocabularyId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Vocabulary id
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        data:
+          nullable: true
+        message:
+          type: string
+      required: [success, data, message]
+
+    SuccessMessageOnly:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          nullable: true
+        message:
+          type: string
+      required: [success, data, message]
+
+    SuccessArray:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            type: object
+        message:
+          type: string
+      required: [success, data, message]
+
+    SuccessHealth:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            status:
+              type: string
+              example: ok
+        message:
+          type: string
+      required: [success, data, message]
+
+    RegisterRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+      required: [username, password]
+
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+      required: [password]
+
+    UserPublic:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        email:
+          type: string
+          nullable: true
+      required: [id, username]
+
+    RegisterResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: "#/components/schemas/UserPublic"
+        message:
+          type: string
+      required: [success, data, message]
+
+    LoginData:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          $ref: "#/components/schemas/UserPublic"
+      required: [token, user]
+
+    LoginResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: "#/components/schemas/LoginData"
+        message:
+          type: string
+      required: [success, data, message]
+
+    VocabularyUpsertRequest:
+      type: object
+      properties:
+        word:
+          type: string
+        phonetic:
+          type: string
+        meaning:
+          type: string
+        example_sentence:
+          type: string
+        audio_url:
+          type: string
+        image_url:
+          type: string
+        difficulty:
+          type: integer
+          minimum: 1
+          maximum: 5
+        topic_ids:
+          type: array
+          items:
+            type: integer
+      required: [word]
+
+    VocabularyItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        word:
+          type: string
+        phonetic:
+          type: string
+          nullable: true
+        meaning:
+          type: string
+          nullable: true
+        example_sentence:
+          type: string
+          nullable: true
+        audio_url:
+          type: string
+          nullable: true
+        image_url:
+          type: string
+          nullable: true
+        difficulty:
+          type: integer
+        topic_ids:
+          type: array
+          items:
+            type: integer
+      required: [id, word, difficulty, topic_ids]
+
+    VocabularyItemResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: "#/components/schemas/VocabularyItem"
+        message:
+          type: string
+      required: [success, data, message]
+
+    VocabularyListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/VocabularyItem"
+        message:
+          type: string
+      required: [success, data, message]

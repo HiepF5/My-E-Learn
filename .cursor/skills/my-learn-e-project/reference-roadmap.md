@@ -48,8 +48,8 @@ Per **FULL DATABASE PRODUCTION VERSION**:
 
 ### Phase D — Vocabulary & content (≈ 1 week)
 
-- [ ] CRUD vocabulary; link topics via map table
-- [ ] Validators for create/update
+- [x] CRUD vocabulary; link topics via map table
+- [x] Validators for create/update
 - [ ] Optional: `collocations`, `word_family` (later phase)
 
 ### Phase E — Review engine (≈ 1.5–2 weeks) — **critical path**
@@ -177,3 +177,15 @@ Remaining tables from production doc (add incrementally): `collocations`, `word_
 4. “Today” returns a deterministic, ordered queue.
 5. Error notebook stores and lists personal mistakes.
 6. Mobile or web can run through **one full day** of learning without manual DB edits.
+
+---
+
+## 6. Notes — items added beyond original roadmap
+
+- [x] Added project-level `.gitignore` (includes `node_modules/`, `.env*`, logs).
+- [x] Added OpenAPI 3.0 spec at `backend/src/docs/openapi.yaml`.
+- [x] Added Swagger UI endpoint at `GET /api/docs`.
+- [x] Added OpenAPI JSON endpoint at `GET /api/openapi.json`.
+- [x] Added API-doc rule in `.cursor/rules/agent-memory-workflow.mdc`:
+  implementation of API is not complete until OpenAPI/Swagger is updated.
+- [x] Added `nodemon` and switched backend `dev` script to auto-reload.

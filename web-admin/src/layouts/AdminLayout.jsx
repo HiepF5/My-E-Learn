@@ -7,6 +7,7 @@ import {
   BugOutlined,
   TagsOutlined,
   FireOutlined,
+  RobotOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
 
@@ -23,6 +24,7 @@ const items = [
   { key: "/errors", icon: <BugOutlined />, label: <Link to="/errors">Errors</Link> },
   { key: "/topics", icon: <TagsOutlined />, label: <Link to="/topics">Topics</Link> },
   { key: "/streak", icon: <FireOutlined />, label: <Link to="/streak">Streak</Link> },
+  { key: "/phase-k", icon: <RobotOutlined />, label: <Link to="/phase-k">Phase K Lab</Link> },
 ];
 
 function AdminLayout() {

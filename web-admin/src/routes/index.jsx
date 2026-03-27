@@ -7,6 +7,7 @@ import ReviewPage from "../pages/ReviewPage";
 import ErrorPage from "../pages/ErrorPage";
 import TopicPage from "../pages/TopicPage";
 import StreakPage from "../pages/StreakPage";
+import PhaseKPage from "../pages/PhaseKPage";
 
 const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem("token");
@@ -30,6 +31,7 @@ function AppRoutes() {
         <Route path="/errors" element={<ErrorPage />} />
         <Route path="/topics" element={<TopicPage />} />
         <Route path="/streak" element={<StreakPage />} />
+        <Route path="/phase-k" element={<PhaseKPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

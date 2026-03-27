@@ -20,6 +20,9 @@ tags:
   - name: AI
   - name: Streak
   - name: Weak words
+  - name: Speaking
+  - name: Writing
+  - name: AI Feedback
 paths:
   /health:
     get:
@@ -886,6 +889,153 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
+  /api/speaking-records:
+    get:
+      tags: [Speaking]
+      summary: List speaking records for current user
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 30
+      responses:
+        "200":
+          description: Speaking records list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpeakingRecordListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      tags: [Speaking]
+      summary: Create a speaking record
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SpeakingRecordCreateRequest"
+      responses:
+        "201":
+          description: Speaking record created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpeakingRecordItemResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/writing-records:
+    get:
+      tags: [Writing]
+      summary: List writing records for current user
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 30
+      responses:
+        "200":
+          description: Writing records list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WritingRecordListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      tags: [Writing]
+      summary: Create a writing record
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WritingRecordCreateRequest"
+      responses:
+        "201":
+          description: Writing record created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WritingRecordItemResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/ai/feedback:
+    get:
+      tags: [AI Feedback]
+      summary: List AI feedback records for current user
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 30
+      responses:
+        "200":
+          description: AI feedback list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AiFeedbackListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      tags: [AI Feedback]
+      summary: Create an AI feedback item
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AiFeedbackCreateRequest"
+      responses:
+        "201":
+          description: AI feedback created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AiFeedbackItemResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
 components:
   securitySchemes:
     bearerAuth:
@@ -1049,6 +1199,213 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/WeakWordItem"
+        message:
+          type: string
+      required: [success, data, message]
+
+    SpeakingRecordItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        word_id:
+          type: integer
+          nullable: true
+        prompt_text:
+          type: string
+          nullable: true
+        transcript_text:
+          type: string
+          nullable: true
+        audio_url:
+          type: string
+          nullable: true
+        score:
+          type: number
+          nullable: true
+        reviewed_at:
+          type: string
+          format: date-time
+          nullable: true
+      required: [id, user_id]
+
+    SpeakingRecordCreateRequest:
+      type: object
+      properties:
+        word_id:
+          type: integer
+        prompt_text:
+          type: string
+        transcript_text:
+          type: string
+        audio_url:
+          type: string
+        score:
+          type: number
+        reviewed_at:
+          type: string
+          format: date-time
+
+    SpeakingRecordItemResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: "#/components/schemas/SpeakingRecordItem"
+        message:
+          type: string
+      required: [success, data, message]
+
+    SpeakingRecordListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/SpeakingRecordItem"
+        message:
+          type: string
+      required: [success, data, message]
+
+    WritingRecordItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        word_id:
+          type: integer
+          nullable: true
+        prompt_text:
+          type: string
+          nullable: true
+        written_text:
+          type: string
+          nullable: true
+        corrected_text:
+          type: string
+          nullable: true
+        score:
+          type: number
+          nullable: true
+        reviewed_at:
+          type: string
+          format: date-time
+          nullable: true
+      required: [id, user_id]
+
+    WritingRecordCreateRequest:
+      type: object
+      properties:
+        word_id:
+          type: integer
+        prompt_text:
+          type: string
+        written_text:
+          type: string
+        corrected_text:
+          type: string
+        score:
+          type: number
+        reviewed_at:
+          type: string
+          format: date-time
+
+    WritingRecordItemResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: "#/components/schemas/WritingRecordItem"
+        message:
+          type: string
+      required: [success, data, message]
+
+    WritingRecordListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/WritingRecordItem"
+        message:
+          type: string
+      required: [success, data, message]
+
+    AiFeedbackItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        source_type:
+          type: string
+          enum: [speaking, writing, general]
+        source_id:
+          type: integer
+          nullable: true
+        feedback_text:
+          type: string
+        suggestions:
+          type: string
+          nullable: true
+        model_name:
+          type: string
+          nullable: true
+      required: [id, user_id, source_type, feedback_text]
+
+    AiFeedbackCreateRequest:
+      type: object
+      properties:
+        source_type:
+          type: string
+          enum: [speaking, writing, general]
+        source_id:
+          type: integer
+        feedback_text:
+          type: string
+        suggestions:
+          type: string
+        model_name:
+          type: string
+      required: [feedback_text]
+
+    AiFeedbackItemResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: "#/components/schemas/AiFeedbackItem"
+        message:
+          type: string
+      required: [success, data, message]
+
+    AiFeedbackListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/AiFeedbackItem"
         message:
           type: string
       required: [success, data, message]

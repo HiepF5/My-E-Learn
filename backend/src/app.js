@@ -42,8 +42,11 @@ app.use("/api/topics", authMiddleware, require("./routes/topic.route"));
 app.use("/api/review", authMiddleware, require("./routes/review.route"));
 app.use("/api/errors", authMiddleware, require("./routes/error.route"));
 app.use("/api/ai", authMiddleware, require("./routes/ai.route"));
+app.use("/api/ai/feedback", authMiddleware, require("./routes/ai-feedback.route"));
 app.use("/api/streak", authMiddleware, require("./routes/streak.route"));
 app.use("/api/weak-words", authMiddleware, require("./routes/weak-word.route"));
+app.use("/api/speaking-records", authMiddleware, require("./routes/speaking-record.route"));
+app.use("/api/writing-records", authMiddleware, require("./routes/writing-record.route"));
 
 app.get("/health", (req, res) => {
   res.status(200).json({

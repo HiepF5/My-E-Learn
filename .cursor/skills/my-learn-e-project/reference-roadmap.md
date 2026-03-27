@@ -111,8 +111,8 @@ Tech: Riverpod, Dio, optional Hive later.
 
 - [x] `streak_tracking`, heatmap UI
 - [x] `weak_word_detector` table + boosting
-- [ ] `confusion_pairs` / pair confusion boosting
-- [ ] Speaking/writing records, `ai_feedback`
+- [x] `confusion_pairs` / pair confusion boosting (foundation: `review_history.selected_word_id` + recent pair boost in AI plan)
+- [x] Speaking/writing records, `ai_feedback` (MVP foundation + API + web/mobile integration)
 - [ ] LLM sentence correction (Phase 2+)
 
 ---
@@ -150,6 +150,8 @@ Tech: Riverpod, Dio, optional Hive later.
 - [x] `routes/error.route.js`
 - [x] `routes/topics.route.js` (implemented as `routes/topic.route.js`)
 - [x] `routes/ai.route.js` (Phase J — `POST /api/ai/generate-today-plan`)
+- [x] `routes/streak.route.js` (`/api/streak/current`, `/api/streak/check-in`, `/api/streak/heatmap`)
+- [x] `routes/weak-word.route.js` (`GET /api/weak-words`)
 - [x] Matching controllers, services, repositories
 - [x] `validators/` for each resource
 - [x] `constants/` intervals, review modes enum
@@ -159,6 +161,8 @@ Tech: Riverpod, Dio, optional Hive later.
 - [x] `calculateNextReview` + ease factor + response time hook (optional)
 - [x] `review_history` insert on each submit
 - [x] Daily cap (e.g. max 20–30 items) for “today”
+- [x] `POST /api/review/submit` accepts optional `selected_word_id` when `answer_result=false` for pair-confusion tracking
+- [x] Rule boost from recent pair-confusion history integrated into AI today plan (`weak_word_ids` boosted)
 
 ### Mobile contract
 
@@ -167,6 +171,7 @@ Tech: Riverpod, Dio, optional Hive later.
 - [x] Client contract:
   - **React web-admin**: su dung field `snake_case` truc tiep tu API, khong doi key sang camelCase.
   - **Flutter mobile**: parse map `snake_case` truc tiep trong model/service.
+  - **Review submit**: khi user tra loi sai (`answer_result=false`), client gui them `selected_word_id` de backend track confusion pairs.
 
 ### Quality
 
@@ -181,7 +186,7 @@ Tech: Riverpod, Dio, optional Hive later.
 
 ## 4. DB tables — full 24-table vision (later migrations)
 
-Remaining tables from production doc (add incrementally): `collocations`, `word_family`, `error_tags`, `error_tag_map`, `streak_tracking`, `speaking_records`, `writing_records`, `ai_feedback`, `weak_word_detector`, etc.
+Remaining tables from production doc (add incrementally): `confusion_pairs` (materialized table, optional), speaking/writing scoring extensions, etc.
 
 ---
 
@@ -205,6 +210,19 @@ Remaining tables from production doc (add incrementally): `collocations`, `word_
 - [x] Added API-doc rule in `.cursor/rules/agent-memory-workflow.mdc`:
   implementation of API is not complete until OpenAPI/Swagger is updated.
 - [x] Added `nodemon` and switched backend `dev` script to auto-reload.
+- [x] Added weak-word foundation: migration/model/repository/service + API `GET /api/weak-words`.
+- [x] Added pair-confusion foundation:
+  - `review_history.selected_word_id` (optional in submit payload),
+  - AI plan boosting from recent wrong selections,
+  - mobile/web submit flow updated to send `selected_word_id` on wrong answers.
+- [x] Added Phase K speaking/writing/feedback foundation:
+  - tables: `speaking_records`, `writing_records`, `ai_feedback`,
+  - APIs: `GET/POST /api/speaking-records`, `GET/POST /api/writing-records`, `GET/POST /api/ai/feedback`,
+  - web-admin Phase K Lab page + mobile Daily Summary integration.
+- [x] Updated OpenAPI for new contracts:
+  - `GET /api/weak-words`,
+  - `ReviewSubmitRequest.selected_word_id`,
+  - speaking/writing/ai-feedback endpoints.
 
 ---
 
@@ -233,6 +251,8 @@ Các mục **ở trên ưu tiên hơn**; tick khi hoàn thành.
 
 ### P4 — Mở rộng & production
 
-- [ ] **Phase K**: `streak_tracking` + heatmap UI (**done**); `weak_word_detector`; `confusion_pairs`; speaking/writing + `ai_feedback`.
+- [x] **Phase K (done)**: speaking/writing + `ai_feedback` foundation.
+- [x] **Phase K done so far**: `streak_tracking` + heatmap, `weak_word_detector` boosting, `confusion_pairs` foundation.
+- [ ] **Phase K (next, optional)**: materialized `confusion_pairs` table + advanced scoring/analytics.
 - [ ] **LLM** (sau rule engine): sửa câu / gợi ý — chỉ khi Phase J ổn.
 - [x] **Deploy**: Docker Compose (MySQL + API), CORS theo domain production, biến môi trường staging/prod.

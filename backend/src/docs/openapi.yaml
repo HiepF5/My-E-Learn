@@ -9,6 +9,7 @@ tags:
   - name: Health
   - name: Auth
   - name: Vocabulary
+  - name: Content
   - name: Review
   - name: Errors
 paths:
@@ -125,6 +126,136 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
+
+  /api/vocabulary/{id}/collocations:
+    get:
+      tags: [Content]
+      summary: List collocations for a vocabulary
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/VocabularyId"
+      responses:
+        "200":
+          description: Collocations list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollocationListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      tags: [Content]
+      summary: Create collocation for a vocabulary
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/VocabularyId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CollocationRequest"
+      responses:
+        "201":
+          description: Collocation created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollocationItemResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/vocabulary/{id}/collocations/{collocationId}:
+    delete:
+      tags: [Content]
+      summary: Delete collocation by id
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/VocabularyId"
+        - $ref: "#/components/parameters/CollocationId"
+      responses:
+        "200":
+          description: Collocation deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessMessageOnly"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/vocabulary/{id}/word-family:
+    get:
+      tags: [Content]
+      summary: List word family for a vocabulary
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/VocabularyId"
+      responses:
+        "200":
+          description: Word family list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WordFamilyListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      tags: [Content]
+      summary: Create word family item for a vocabulary
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/VocabularyId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WordFamilyRequest"
+      responses:
+        "201":
+          description: Word family item created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WordFamilyItemResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/vocabulary/{id}/word-family/{wordFamilyId}:
+    delete:
+      tags: [Content]
+      summary: Delete word family item by id
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/VocabularyId"
+        - $ref: "#/components/parameters/WordFamilyId"
+      responses:
+        "200":
+          description: Word family item deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessMessageOnly"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
     put:
       tags: [Vocabulary]
       summary: Update vocabulary by id
@@ -217,6 +348,20 @@ components:
       schema:
         type: integer
       description: Vocabulary id
+    CollocationId:
+      name: collocationId
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Collocation id
+    WordFamilyId:
+      name: wordFamilyId
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Word family item id
 
   responses:
     BadRequest:
@@ -447,6 +592,104 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/VocabularyItem"
+        message:
+          type: string
+      required: [success, data, message]
+
+    CollocationRequest:
+      type: object
+      properties:
+        collocation:
+          type: string
+        example:
+          type: string
+      required: [collocation]
+
+    CollocationItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        word_id:
+          type: integer
+        collocation:
+          type: string
+        example:
+          type: string
+          nullable: true
+      required: [id, word_id, collocation]
+
+    CollocationItemResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: "#/components/schemas/CollocationItem"
+        message:
+          type: string
+      required: [success, data, message]
+
+    CollocationListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/CollocationItem"
+        message:
+          type: string
+      required: [success, data, message]
+
+    WordFamilyRequest:
+      type: object
+      properties:
+        related_word:
+          type: string
+        relation_type:
+          type: string
+      required: [related_word]
+
+    WordFamilyItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        root_word_id:
+          type: integer
+        related_word:
+          type: string
+        relation_type:
+          type: string
+          nullable: true
+      required: [id, root_word_id, related_word]
+
+    WordFamilyItemResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: "#/components/schemas/WordFamilyItem"
+        message:
+          type: string
+      required: [success, data, message]
+
+    WordFamilyListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/WordFamilyItem"
         message:
           type: string
       required: [success, data, message]

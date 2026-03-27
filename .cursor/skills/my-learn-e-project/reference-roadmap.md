@@ -50,7 +50,7 @@ Per **FULL DATABASE PRODUCTION VERSION**:
 
 - [x] CRUD vocabulary; link topics via map table
 - [x] Validators for create/update
-- [ ] Optional: `collocations`, `word_family` (later phase)
+- [x] Optional: `collocations`, `word_family` (later phase)
 
 ### Phase E — Review engine (≈ 1.5–2 weeks) — **critical path**
 

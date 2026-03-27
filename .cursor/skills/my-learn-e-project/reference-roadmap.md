@@ -41,10 +41,10 @@ Per **FULL DATABASE PRODUCTION VERSION**:
 
 ### Phase C — Auth (≈ 3–5 days)
 
-- [ ] `users` model; bcrypt hash; JWT sign/verify
-- [ ] `middlewares/auth.middleware.js` — Bearer token
-- [ ] Routes: register, login
-- [ ] Protect vocabulary/review/errors routes
+- [x] `users` model; bcrypt hash; JWT sign/verify
+- [x] `middlewares/auth.middleware.js` — Bearer token
+- [x] Routes: register, login
+- [x] Protect vocabulary/review/errors routes
 
 ### Phase D — Vocabulary & content (≈ 1 week)
 

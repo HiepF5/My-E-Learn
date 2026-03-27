@@ -16,3 +16,6 @@ pnpm-debug.log*
 # operating system files
 .DS_Store
 Thumbs.db
+
+# IDE (JetBrains / Android Studio)
+.idea/

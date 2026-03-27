@@ -24,6 +24,7 @@ app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(openapiSpec));
 
 app.use("/api/auth", require("./routes/auth.route"));
 app.use("/api/vocabulary", authMiddleware, require("./routes/vocabulary.route"));
+app.use("/api/topics", authMiddleware, require("./routes/topic.route"));
 app.use("/api/review", authMiddleware, require("./routes/review.route"));
 app.use("/api/errors", authMiddleware, require("./routes/error.route"));
 

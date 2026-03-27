@@ -408,6 +408,65 @@ Muc dich: ghi lai nhung yeu cau ban da giao va nhung gi da duoc tao/sua de de to
 
 ---
 
+## 23) "Dọn dist ve trang thai truoc build va tiep tuc P1.3"
+
+- Trang thai: DONE
+- Da lam:
+  - Don `web-admin/dist` ve trang thai truoc khi chay build (xoa artifact moi sinh).
+  - Tiep tuc P1.3 va chot convention API JSON: **snake_case**.
+  - Cap nhat OpenAPI de ghi ro convention cho request/response.
+  - Cap nhat roadmap/checklist: danh dau xong muc P1.3 va ghi ro contract cho React/Flutter.
+- Files tao/sua:
+  - `backend/src/docs/openapi.yaml`
+  - `.cursor/skills/my-learn-e-project/reference-roadmap.md`
+  - `NOTE_BY_QUESTIONS.md`
+
+---
+
+## 24) "@reference-roadmap lam tiep"
+
+- Trang thai: DONE (P2.1)
+- Da lam:
+  - Tiep tuc theo roadmap, chon muc uu tien cao nhat chua xong: **P2.1 Quality**.
+  - Setup ESLint + Prettier cho `backend` va `web-admin`.
+  - Them script `lint`, `lint:fix`, `format`, `format:check` vao ca hai package.
+  - Them config:
+    - `backend/eslint.config.cjs`
+    - `web-admin/eslint.config.js`
+    - `.prettierrc.json`
+    - `.prettierignore`
+  - Chay `npm run lint` cho ca `backend` va `web-admin` thanh cong.
+  - Cap nhat roadmap: tick xong `Lint + format on backend/frontend` va `P2 Quality`.
+- Files tao/sua:
+  - `backend/package.json`
+  - `backend/eslint.config.cjs`
+  - `web-admin/package.json`
+  - `web-admin/eslint.config.js`
+  - `.prettierrc.json`
+  - `.prettierignore`
+  - `.cursor/skills/my-learn-e-project/reference-roadmap.md`
+  - `NOTE_BY_QUESTIONS.md`
+
+---
+
+## 25) "Lam tiep roadmap - P2.2 CI"
+
+- Trang thai: DONE
+- Da lam:
+  - Them GitHub Actions CI cho `backend` va `web-admin`.
+  - Pipeline chay khi `push`/`pull_request` vao `main`, `develop`.
+  - Backend job: `npm ci` + `npm run lint`.
+  - Web-admin job: `npm ci` + `npm run lint` + `npm run build`.
+  - Verify secrets: check tracked env files, ket qua chi co `.env.example`.
+  - Cap nhat roadmap: tick xong muc P2.2 (CI).
+  - Cap nhat roadmap: tick xong muc P2.3 (Secrets).
+- Files tao/sua:
+  - `.github/workflows/ci.yml`
+  - `.cursor/skills/my-learn-e-project/reference-roadmap.md`
+  - `NOTE_BY_QUESTIONS.md`
+
+---
+
 ## Cach su dung file note nay
 
 - Moi yeu cau moi: them 1 section moi o cuoi file.

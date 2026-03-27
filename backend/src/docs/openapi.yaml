@@ -3,11 +3,16 @@ info:
   title: MY LEARN E API
   version: 1.0.0
   description: Backend API documentation for MY LEARN E.
+x-json-convention:
+  case: snake_case
+  applies_to: request_body_and_response_body
+  note: Clients (web-admin, mobile-app) should consume snake_case fields directly.
 servers:
   - url: http://localhost:5000
 tags:
   - name: Health
   - name: Auth
+  - name: Topics
   - name: Vocabulary
   - name: Content
   - name: Review
@@ -68,6 +73,108 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
+
+  /api/topics:
+    get:
+      tags: [Topics]
+      summary: List topics
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Topic list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TopicListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      tags: [Topics]
+      summary: Create topic
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TopicUpsertRequest"
+      responses:
+        "201":
+          description: Topic created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TopicItemResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/topics/{id}:
+    get:
+      tags: [Topics]
+      summary: Get topic by id
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/TopicId"
+      responses:
+        "200":
+          description: Topic detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TopicItemResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags: [Topics]
+      summary: Update topic by id
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/TopicId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TopicUpsertRequest"
+      responses:
+        "200":
+          description: Topic updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TopicItemResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [Topics]
+      summary: Delete topic by id
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/TopicId"
+      responses:
+        "200":
+          description: Topic deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessMessageOnly"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /api/vocabulary:
     get:
@@ -662,6 +769,13 @@ components:
       bearerFormat: JWT
 
   parameters:
+    TopicId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Topic id
     VocabularyId:
       name: id
       in: path
@@ -725,6 +839,60 @@ components:
             $ref: "#/components/schemas/ErrorResponse"
 
   schemas:
+    TopicUpsertRequest:
+      type: object
+      properties:
+        topic_name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        level:
+          type: string
+          nullable: true
+      required: [topic_name]
+
+    TopicItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        topic_name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        level:
+          type: string
+          nullable: true
+      required: [id, topic_name]
+
+    TopicItemResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: "#/components/schemas/TopicItem"
+        message:
+          type: string
+      required: [success, data, message]
+
+    TopicListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/TopicItem"
+        message:
+          type: string
+      required: [success, data, message]
+
     ErrorResponse:
       type: object
       properties:

@@ -138,34 +138,39 @@ Tech: Riverpod, Dio, optional Hive later.
 
 ### Infrastructure
 
-- [ ] Node LTS, `npm`/`pnpm` lockfile
-- [ ] Backend scripts: `dev`, `start`, `migrate`
+- [x] Node LTS, `npm`/`pnpm` lockfile
+- [x] Backend scripts: `dev`, `start`, `migrate`
 - [ ] MySQL 8+ local or Docker
 
 ### Backend modules
 
-- [ ] `routes/auth.route.js`
-- [ ] `routes/vocabulary.route.js`
-- [ ] `routes/review.route.js`
-- [ ] `routes/error.route.js`
-- [ ] Matching controllers, services, repositories
-- [ ] `validators/` for each resource
+- [x] `routes/auth.route.js`
+- [x] `routes/vocabulary.route.js`
+- [x] `routes/review.route.js`
+- [x] `routes/error.route.js`
+- [x] `routes/topics.route.js` (implemented as `routes/topic.route.js`)
+- [x] Matching controllers, services, repositories
+- [x] `validators/` for each resource
 - [ ] `constants/` intervals, review modes enum
 
 ### Review domain
 
-- [ ] `calculateNextReview` + ease factor + response time hook (optional)
-- [ ] `review_history` insert on each submit
-- [ ] Daily cap (e.g. max 20–30 items) for “today”
+- [x] `calculateNextReview` + ease factor + response time hook (optional)
+- [x] `review_history` insert on each submit
+- [x] Daily cap (e.g. max 20–30 items) for “today”
 
 ### Mobile contract
 
-- [ ] Same DTOs as web; document field names (`snake_case` JSON vs camelCase — **pick one API convention and document**; many teams use camelCase in JSON with Sequelize `underscored: true`)
+- [x] Same DTOs as web; document field names (`snake_case` JSON vs camelCase — **pick one API convention and document**; many teams use camelCase in JSON with Sequelize `underscored: true`)
+- [x] Convention chot: **API JSON dung `snake_case`** cho request/response (vd: `word_id`, `topic_name`, `error_type`, `review_mode`).
+- [x] Client contract:
+  - **React web-admin**: su dung field `snake_case` truc tiep tu API, khong doi key sang camelCase.
+  - **Flutter mobile**: parse map `snake_case` truc tiep trong model/service.
 
 ### Quality
 
-- [ ] No secrets in repo
-- [ ] Lint + format on backend/frontend
+- [x] No secrets in repo
+- [x] Lint + format on backend/frontend
 - [ ] Smoke test script or Postman collection (optional)
 
 ---
@@ -196,3 +201,34 @@ Remaining tables from production doc (add incrementally): `collocations`, `word_
 - [x] Added API-doc rule in `.cursor/rules/agent-memory-workflow.mdc`:
   implementation of API is not complete until OpenAPI/Swagger is updated.
 - [x] Added `nodemon` and switched backend `dev` script to auto-reload.
+
+---
+
+## 7. Checklist ưu tiên tiếp theo (cao → thấp)
+
+Các mục **ở trên ưu tiên hơn**; tick khi hoàn thành.
+
+### P1 — Làm trước (nền tảng sản phẩm)
+
+- [x] **Topics end-to-end**: API CRUD `topics` (list/create/update/delete) + liên kết `vocabulary_topic_map`; Web admin **Topic Manager** đầy đủ (thay trang scaffold).
+- [x] **Đồng bộ checklist §3** (Infrastructure / Backend modules / Review domain / Quality) với code thực tế — cập nhật tick `[x]` hoặc ghi chú “đã có ở …”.
+- [x] **Chuẩn hóa API JSON**: chọn một convention (`snake_case` hoặc `camelCase` cho body/response) + cập nhật `openapi.yaml` + ghi rõ cho Flutter/React.
+
+### P2 — Chất lượng & vận hành
+
+- [x] **Quality**: ESLint/Prettier cho `backend` + `web-admin`; tùy chọn `flutter analyze` cho `mobile-app`.
+- [x] **CI**: pipeline chạy lint + build (ít nhất web-admin + backend).
+- [x] **Secrets**: đảm bảo `.env` không vào git; chỉ `.env.example` trong repo.
+- [ ] **Smoke test**: script hoặc Postman/Thunder collection bám OpenAPI (tùy chọn nhưng nên có).
+
+### P3 — Tính năng lõi tiếp theo
+
+- [ ] **Review**: daily cap rõ ràng (ví dụ max 20–30) + tài liệu hành vi; (tuỳ chọn) hook `response_time_ms` trong thuật toán.
+- [ ] **Phase J**: `backend/src/ai/` rule-based (priority, false-master, error patterns) + `POST /api/ai/generate-today-plan` + OpenAPI.
+- [ ] **Mobile**: màn **3-touch** thật (Recognize → Type → Sentence) gọi `/api/review/touch/...`; queue sync khi có mạng.
+
+### P4 — Mở rộng & production
+
+- [ ] **Phase K**: `streak_tracking` + heatmap UI; `weak_word_detector`; `confusion_pairs`; speaking/writing + `ai_feedback`.
+- [ ] **LLM** (sau rule engine): sửa câu / gợi ý — chỉ khi Phase J ổn.
+- [ ] **Deploy**: Docker Compose (MySQL + API), CORS theo domain production, biến môi trường staging/prod.

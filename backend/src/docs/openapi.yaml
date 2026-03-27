@@ -350,6 +350,54 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
+  /api/review/touch/{wordId}:
+    get:
+      tags: [Review]
+      summary: Get touch history for a word
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/WordId"
+      responses:
+        "200":
+          description: Touch history by user and word
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TouchHistoryResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [Review]
+      summary: Update one touch step (1/2/3)
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/WordId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TouchPatchRequest"
+      responses:
+        "200":
+          description: Touch step updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TouchHistoryResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
   /api/errors:
     get:
       tags: [Errors]
@@ -395,6 +443,13 @@ components:
       schema:
         type: integer
       description: Word family item id
+    WordId:
+      name: wordId
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Word id
 
   responses:
     BadRequest:
@@ -795,6 +850,56 @@ components:
           example: true
         data:
           $ref: "#/components/schemas/ReviewProgressItem"
+        message:
+          type: string
+      required: [success, data, message]
+
+    TouchPatchRequest:
+      type: object
+      properties:
+        touch_step:
+          type: integer
+          enum: [1, 2, 3]
+        done:
+          type: boolean
+      required: [touch_step]
+
+    TouchHistoryItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        word_id:
+          type: integer
+        touch1_done:
+          type: boolean
+        touch2_done:
+          type: boolean
+        touch3_done:
+          type: boolean
+        eligible_for_learned:
+          type: boolean
+      required:
+        [
+          id,
+          user_id,
+          word_id,
+          touch1_done,
+          touch2_done,
+          touch3_done,
+          eligible_for_learned,
+        ]
+
+    TouchHistoryResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: "#/components/schemas/TouchHistoryItem"
         message:
           type: string
       required: [success, data, message]

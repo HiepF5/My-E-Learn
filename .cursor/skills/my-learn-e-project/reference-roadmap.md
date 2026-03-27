@@ -62,9 +62,9 @@ Per **FULL DATABASE PRODUCTION VERSION**:
 
 ### Phase F — 3-touch (≈ 1 week)
 
-- [ ] `touch_history` read/update per user/word
-- [ ] Business rule: all three touches true → eligible for “learned” / progression flags
-- [ ] API endpoints as needed (e.g. `PATCH` touch steps or dedicated submit)
+- [x] `touch_history` read/update per user/word
+- [x] Business rule: all three touches true → eligible for “learned” / progression flags
+- [x] API endpoints as needed (e.g. `PATCH` touch steps or dedicated submit)
 
 ### Phase G — Error notebook (≈ 1 week)
 

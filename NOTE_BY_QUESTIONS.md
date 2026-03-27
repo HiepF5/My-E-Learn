@@ -224,6 +224,29 @@ Muc dich: ghi lai nhung yeu cau ban da giao va nhung gi da duoc tao/sua de de to
 
 ---
 
+## 15) "Phase F - 3-touch"
+
+- Trang thai: DONE
+- Da lam:
+  - Tao `touch_history` read/update theo `user_id + word_id`.
+  - Implement business rule: du 3 touch (`touch1_done && touch2_done && touch3_done`) thi
+    tra `eligible_for_learned = true`.
+  - Them API endpoints:
+    - `GET /api/review/touch/:wordId`
+    - `PATCH /api/review/touch/:wordId` (body `touch_step`, `done`)
+  - Cap nhat OpenAPI 3.0 + Swagger cho 3-touch endpoints.
+- Files tao/sua:
+  - `backend/src/models/touch-history.model.js`
+  - `backend/src/repositories/touch.repository.js`
+  - `backend/src/services/touch.service.js`
+  - `backend/src/controllers/touch.controller.js`
+  - `backend/src/validators/touch.validator.js`
+  - `backend/src/routes/review.route.js`
+  - `backend/src/docs/openapi.yaml`
+  - `.cursor/skills/my-learn-e-project/reference-roadmap.md` (tick checklist)
+
+---
+
 ## Cach su dung file note nay
 
 - Moi yeu cau moi: them 1 section moi o cuoi file.

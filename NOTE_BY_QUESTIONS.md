@@ -518,6 +518,40 @@ Muc dich: ghi lai nhung yeu cau ban da giao va nhung gi da duoc tao/sua de de to
 
 ---
 
+## 28) "P3.2 Phase J - AI rule engine"
+
+- Trang thai: DONE
+- Da lam:
+  - Them module rule-based trong `backend/src/ai/`:
+    - `priority.js` — diem uu tien tu `review_progress`
+    - `false-master.js` — heuristic "hoc nham nhung van sai"
+    - `error-patterns.js` — `mistake_focus` tu error notebook
+    - `plan-generator.js` — ghep plan JSON
+  - Them `POST /api/ai/generate-today-plan` (JWT), body optional: `daily_target_words`, `review_cap`
+  - Service: `backend/src/services/ai.service.js`; controller, validator, route
+  - Mo rong repo: `review.repository.findProgressByUser`, `vocabulary.repository.countWordsPerTopic`
+  - Cap nhat OpenAPI (tag AI + schemas)
+  - Smoke test: them check `/api/ai/generate-today-plan` khi co `SMOKE_USERNAME`/`SMOKE_PASSWORD`
+  - Cap nhat roadmap: Phase J + P3 Phase J
+- Files tao/sua:
+  - `backend/src/ai/priority.js`
+  - `backend/src/ai/false-master.js`
+  - `backend/src/ai/error-patterns.js`
+  - `backend/src/ai/plan-generator.js`
+  - `backend/src/services/ai.service.js`
+  - `backend/src/controllers/ai.controller.js`
+  - `backend/src/validators/ai.validator.js`
+  - `backend/src/routes/ai.route.js`
+  - `backend/src/app.js`
+  - `backend/src/repositories/review.repository.js`
+  - `backend/src/repositories/vocabulary.repository.js`
+  - `backend/src/docs/openapi.yaml`
+  - `backend/scripts/smoke-test.js`
+  - `.cursor/skills/my-learn-e-project/reference-roadmap.md`
+  - `NOTE_BY_QUESTIONS.md`
+
+---
+
 ## Cach su dung file note nay
 
 - Moi yeu cau moi: them 1 section moi o cuoi file.

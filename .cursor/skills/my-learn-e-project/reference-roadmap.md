@@ -103,9 +103,9 @@ Tech: Riverpod, Dio, optional Hive later.
 
 ### Phase J — AI rule engine (≈ 2+ weeks, after core stable)
 
-- [ ] `src/ai/` modules: priority, false-master heuristic, error patterns (rule-based)
-- [ ] `POST /api/ai/generate-today-plan` (JSON plan: topic, counts, mistake_focus)
-- [ ] No LLM required for Phase J.1
+- [x] `src/ai/` modules: priority, false-master heuristic, error patterns (rule-based)
+- [x] `POST /api/ai/generate-today-plan` (JSON plan: topic, counts, mistake_focus)
+- [x] No LLM required for Phase J.1
 
 ### Phase K — Stretch
 
@@ -149,6 +149,7 @@ Tech: Riverpod, Dio, optional Hive later.
 - [x] `routes/review.route.js`
 - [x] `routes/error.route.js`
 - [x] `routes/topics.route.js` (implemented as `routes/topic.route.js`)
+- [x] `routes/ai.route.js` (Phase J — `POST /api/ai/generate-today-plan`)
 - [x] Matching controllers, services, repositories
 - [x] `validators/` for each resource
 - [x] `constants/` intervals, review modes enum
@@ -227,7 +228,7 @@ Các mục **ở trên ưu tiên hơn**; tick khi hoàn thành.
 ### P3 — Tính năng lõi tiếp theo
 
 - [x] **Review**: daily cap rõ ràng (ví dụ max 20–30) + tài liệu hành vi; (tuỳ chọn) hook `response_time_ms` trong thuật toán.
-- [ ] **Phase J**: `backend/src/ai/` rule-based (priority, false-master, error patterns) + `POST /api/ai/generate-today-plan` + OpenAPI.
+- [x] **Phase J**: `backend/src/ai/` rule-based (priority, false-master, error patterns) + `POST /api/ai/generate-today-plan` + OpenAPI.
 - [ ] **Mobile**: màn **3-touch** thật (Recognize → Type → Sentence) gọi `/api/review/touch/...`; queue sync khi có mạng.
 
 ### P4 — Mở rộng & production

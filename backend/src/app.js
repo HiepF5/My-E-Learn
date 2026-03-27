@@ -27,6 +27,7 @@ app.use("/api/vocabulary", authMiddleware, require("./routes/vocabulary.route"))
 app.use("/api/topics", authMiddleware, require("./routes/topic.route"));
 app.use("/api/review", authMiddleware, require("./routes/review.route"));
 app.use("/api/errors", authMiddleware, require("./routes/error.route"));
+app.use("/api/ai", authMiddleware, require("./routes/ai.route"));
 
 app.get("/health", (req, res) => {
   res.status(200).json({

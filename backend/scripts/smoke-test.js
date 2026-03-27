@@ -82,6 +82,15 @@ const main = async () => {
   assertOk(Array.isArray(reviewTodayBody?.data), "/api/review/today data must be array");
   console.log("[smoke] PASS /api/review/today?limit=1");
 
+  const { response: planRes, body: planBody } = await request("/api/ai/generate-today-plan", {
+    method: "POST",
+    headers: authHeaders,
+    body: JSON.stringify({}),
+  });
+  assertOk(planRes.ok, `/api/ai/generate-today-plan failed with status ${planRes.status}`);
+  assertOk(planBody?.data?.today_plan?.meta?.llm === false, "today_plan.meta.llm must be false");
+  console.log("[smoke] PASS /api/ai/generate-today-plan");
+
   // Tiny delay helps logs stay readable in CI.
   await sleep(100);
 };

@@ -1,3 +1,4 @@
+const { fn, col } = require("sequelize");
 const Vocabulary = require("../models/vocabulary.model");
 const VocabularyTopicMap = require("../models/vocabulary-topic-map.model");
 
@@ -35,6 +36,18 @@ const getTopicIdsByWordId = async (wordId) => {
   return rows.map((row) => row.topic_id);
 };
 
+const countWordsPerTopic = async () => {
+  const rows = await VocabularyTopicMap.findAll({
+    attributes: ["topic_id", [fn("COUNT", col("word_id")), "word_count"]],
+    group: ["topic_id"],
+    raw: true,
+  });
+  return rows.map((row) => ({
+    topic_id: Number(row.topic_id),
+    word_count: Number(row.word_count),
+  }));
+};
+
 module.exports = {
   createVocabulary,
   findAllVocabulary,
@@ -43,4 +56,5 @@ module.exports = {
   deleteVocabulary,
   replaceTopicMap,
   getTopicIdsByWordId,
+  countWordsPerTopic,
 };

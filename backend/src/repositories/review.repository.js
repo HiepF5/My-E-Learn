@@ -53,6 +53,17 @@ const findDueRowsForQueue = (limit = 1000) => {
   });
 };
 
+const findProgressByUser = (userId, limit = 50) => {
+  return ReviewProgress.findAll({
+    where: { user_id: userId },
+    order: [
+      ["wrong_count", "DESC"],
+      ["next_review", "ASC"],
+    ],
+    limit,
+  });
+};
+
 module.exports = {
   findProgressByUserAndWord,
   createProgress,
@@ -62,4 +73,5 @@ module.exports = {
   clearQueueByDate,
   createQueueItems,
   findDueRowsForQueue,
+  findProgressByUser,
 };

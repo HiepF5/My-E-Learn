@@ -247,6 +247,64 @@ Muc dich: ghi lai nhung yeu cau ban da giao va nhung gi da duoc tao/sua de de to
 
 ---
 
+## 16) "Phase G - Error notebook"
+
+- Trang thai: DONE (bat buoc) / PARTIAL (optional tags)
+- Da lam:
+  - Implement `error_notebook` CRUD day du field:
+    `error_type`, `wrong_text`, `corrected_text`, `repeat_count`, `fixed`, `explanation`.
+  - Them dashboard metric endpoint top repeated errors:
+    `GET /api/errors/top-repeated?limit=...`.
+  - Them endpoint thao tac:
+    - `GET /api/errors`
+    - `POST /api/errors`
+    - `PUT /api/errors/:id`
+    - `PATCH /api/errors/:id/fixed`
+    - `PATCH /api/errors/:id/repeat`
+    - `DELETE /api/errors/:id`
+  - Cap nhat OpenAPI 3.0 + Swagger cho tat ca endpoints tren.
+- Chua lam:
+  - Khong con (optional tags da duoc lam o muc 17).
+- Files tao/sua:
+  - `backend/src/models/error-notebook.model.js`
+  - `backend/src/repositories/error.repository.js`
+  - `backend/src/services/error.service.js`
+  - `backend/src/controllers/error.controller.js`
+  - `backend/src/validators/error.validator.js`
+  - `backend/src/routes/error.route.js`
+  - `backend/src/docs/openapi.yaml`
+  - `.cursor/skills/my-learn-e-project/reference-roadmap.md` (tick checklist)
+
+---
+
+## 17) "Optional: error_tags, error_tag_map"
+
+- Trang thai: DONE
+- Da lam:
+  - Tao migration cho bang `error_tags` va `error_tag_map`.
+  - Tao model/repository/service/controller/validator cho tags.
+  - Them API:
+    - `GET /api/errors/tags`
+    - `POST /api/errors/tags`
+    - `GET /api/errors/:id/tags`
+    - `PUT /api/errors/:id/tags`
+  - Chay migrate thanh cong.
+  - Cap nhat OpenAPI/Swagger cho tags API.
+  - Tick checklist optional trong Phase G.
+- Files tao/sua:
+  - `database/migrations/20260327104000-add-error-tags.js`
+  - `backend/src/models/error-tag.model.js`
+  - `backend/src/models/error-tag-map.model.js`
+  - `backend/src/repositories/error-tag.repository.js`
+  - `backend/src/services/error.service.js`
+  - `backend/src/controllers/error.controller.js`
+  - `backend/src/validators/error.validator.js`
+  - `backend/src/routes/error.route.js`
+  - `backend/src/docs/openapi.yaml`
+  - `.cursor/skills/my-learn-e-project/reference-roadmap.md`
+
+---
+
 ## Cach su dung file note nay
 
 - Moi yeu cau moi: them 1 section moi o cuoi file.

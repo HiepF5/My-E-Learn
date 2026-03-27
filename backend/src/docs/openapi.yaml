@@ -401,18 +401,258 @@ paths:
   /api/errors:
     get:
       tags: [Errors]
-      summary: Error notebook list
+      summary: List error notebook items
       security:
         - bearerAuth: []
       responses:
         "200":
-          description: Error route placeholder
+          description: Error notebook list
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SuccessArray"
+                $ref: "#/components/schemas/ErrorNotebookListResponse"
         "401":
           $ref: "#/components/responses/Unauthorized"
+    post:
+      tags: [Errors]
+      summary: Create error notebook item
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ErrorNotebookRequest"
+      responses:
+        "201":
+          description: Error notebook item created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorNotebookItemResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/errors/top-repeated:
+    get:
+      tags: [Errors]
+      summary: Top repeated errors for dashboard
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+      responses:
+        "200":
+          description: Top repeated errors
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorNotebookListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/errors/{id}:
+    put:
+      tags: [Errors]
+      summary: Update error notebook item
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/ErrorId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ErrorNotebookRequest"
+      responses:
+        "200":
+          description: Error notebook item updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorNotebookItemResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [Errors]
+      summary: Delete error notebook item
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/ErrorId"
+      responses:
+        "200":
+          description: Error notebook item deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessMessageOnly"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/errors/{id}/fixed:
+    patch:
+      tags: [Errors]
+      summary: Update fixed status
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/ErrorId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fixed:
+                  type: boolean
+              required: [fixed]
+      responses:
+        "200":
+          description: Fixed status updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorNotebookItemResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/errors/{id}/repeat:
+    patch:
+      tags: [Errors]
+      summary: Increment repeat count
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/ErrorId"
+      responses:
+        "200":
+          description: Repeat count incremented
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorNotebookItemResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/errors/tags:
+    get:
+      tags: [Errors]
+      summary: List available error tags
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Error tags list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorTagListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      tags: [Errors]
+      summary: Create error tag
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tag_name:
+                  type: string
+              required: [tag_name]
+      responses:
+        "201":
+          description: Error tag created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorTagItemResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/errors/{id}/tags:
+    get:
+      tags: [Errors]
+      summary: Get tags mapped to one error item
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/ErrorId"
+      responses:
+        "200":
+          description: Error tag mapping
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorTagMapResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags: [Errors]
+      summary: Replace tags for one error item
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/ErrorId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tag_ids:
+                  type: array
+                  items:
+                    type: integer
+              required: [tag_ids]
+      responses:
+        "200":
+          description: Error tag mapping updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorTagMapResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
 components:
   securitySchemes:
@@ -450,6 +690,13 @@ components:
       schema:
         type: integer
       description: Word id
+    ErrorId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Error notebook id
 
   responses:
     BadRequest:
@@ -900,6 +1147,133 @@ components:
           example: true
         data:
           $ref: "#/components/schemas/TouchHistoryItem"
+        message:
+          type: string
+      required: [success, data, message]
+
+    ErrorNotebookRequest:
+      type: object
+      properties:
+        error_type:
+          type: string
+        wrong_text:
+          type: string
+        corrected_text:
+          type: string
+        explanation:
+          type: string
+        repeat_count:
+          type: integer
+          minimum: 1
+        fixed:
+          type: boolean
+      required: [wrong_text]
+
+    ErrorNotebookItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        error_type:
+          type: string
+          nullable: true
+        wrong_text:
+          type: string
+          nullable: true
+        corrected_text:
+          type: string
+          nullable: true
+        explanation:
+          type: string
+          nullable: true
+        repeat_count:
+          type: integer
+        fixed:
+          type: boolean
+      required: [id, user_id, repeat_count, fixed]
+
+    ErrorNotebookItemResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: "#/components/schemas/ErrorNotebookItem"
+        message:
+          type: string
+      required: [success, data, message]
+
+    ErrorNotebookListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/ErrorNotebookItem"
+        message:
+          type: string
+      required: [success, data, message]
+
+    ErrorTagItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        tag_name:
+          type: string
+      required: [id, tag_name]
+
+    ErrorTagItemResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: "#/components/schemas/ErrorTagItem"
+        message:
+          type: string
+      required: [success, data, message]
+
+    ErrorTagListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/ErrorTagItem"
+        message:
+          type: string
+      required: [success, data, message]
+
+    ErrorTagMapItem:
+      type: object
+      properties:
+        error_id:
+          type: integer
+        tag_ids:
+          type: array
+          items:
+            type: integer
+      required: [error_id, tag_ids]
+
+    ErrorTagMapResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: "#/components/schemas/ErrorTagMapItem"
         message:
           type: string
       required: [success, data, message]

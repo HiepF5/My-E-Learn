@@ -68,9 +68,9 @@ Per **FULL DATABASE PRODUCTION VERSION**:
 
 ### Phase G — Error notebook (≈ 1 week)
 
-- [ ] `error_notebook` CRUD; fields: type, wrong, corrected, repeat_count, fixed
-- [ ] Optional: `error_tags`, `error_tag_map`
-- [ ] Dashboard metrics: top repeated errors
+- [x] `error_notebook` CRUD; fields: type, wrong, corrected, repeat_count, fixed
+- [x] Optional: `error_tags`, `error_tag_map`
+- [x] Dashboard metrics: top repeated errors
 
 ### Phase H — Web admin React (≈ 2–4 weeks total, can overlap)
 

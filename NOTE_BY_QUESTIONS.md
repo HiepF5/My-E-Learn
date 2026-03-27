@@ -1,0 +1,209 @@
+# MY LEARN E - Note theo tung cau hoi
+
+Muc dich: ghi lai nhung yeu cau ban da giao va nhung gi da duoc tao/sua de de tong hop.
+
+> Quy uoc:
+> - Trang thai: DONE / PARTIAL / BLOCKED
+> - Chi liet ke thay doi thuc te da duoc tao/sua
+
+---
+
+## 01) "Doc toan bo file MD... tao 1 bo skill agent"
+
+- Trang thai: DONE
+- Da lam:
+  - Doc cac file MD trong repo.
+  - Tao bo skill agent cho du an.
+- Files tao/sua:
+  - `.cursor/skills/my-learn-e-project/SKILL.md`
+  - `.cursor/skills/my-learn-e-project/reference-roadmap.md`
+
+---
+
+## 02) "Thuc hien phase A Git: main / develop / feature/*"
+
+- Trang thai: DONE
+- Da lam:
+  - Khoi tao git branch flow.
+  - Co cac nhanh: `main`, `develop`, `feature/bootstrap`.
+
+---
+
+## 03) "Tao bo ghi nho rule... chua ro phai hoi lai, xong viec phai danh dau"
+
+- Trang thai: DONE
+- Da lam:
+  - Tao rule always apply cho Cursor.
+- Files tao/sua:
+  - `.cursor/rules/agent-memory-workflow.mdc`
+
+---
+
+## 04) "Them shell/git/fetch trong mcp"
+
+- Trang thai: DONE (huong dan cau hinh) + NOTE loi package git MCP
+- Da lam:
+  - Huong dan block `mcp.json`.
+  - Phan tich log loi: `@modelcontextprotocol/server-git` bi 404 npm.
+- Ghi chu:
+  - De xuat dung `shell` va GitLens MCP cho thao tac git.
+
+---
+
+## 05) "Lam 4 muc con lai cua Phase A (khong lam muc backend)"
+
+- Trang thai: DONE
+- Da lam:
+  - Tao `config/database.js`
+  - Tao `.env.example`
+  - Tao error middleware
+  - Tao thu muc migration
+- Files tao/sua:
+  - `backend/src/config/database.js`
+  - `.env.example`
+  - `backend/src/middlewares/error.middleware.js`
+  - `database/migrations/.gitkeep`
+  - `.cursor/skills/my-learn-e-project/reference-roadmap.md` (tick checklist)
+
+---
+
+## 06) "Tao gitignore loai bo node_modules"
+
+- Trang thai: DONE
+- Da lam:
+  - Tao `.gitignore` bo qua `node_modules`, `.env*`, logs, file rac he dieu hanh.
+- Files tao/sua:
+  - `.gitignore`
+
+---
+
+## 07) "Lam tiep muc backend trong Phase A"
+
+- Trang thai: DONE
+- Da lam:
+  - Scaffold backend co Express + Helmet + CORS + Morgan + JSON body.
+  - Them `health` endpoint.
+- Files tao/sua:
+  - `backend/package.json`
+  - `backend/src/app.js`
+  - `backend/src/server.js`
+  - `.cursor/skills/my-learn-e-project/reference-roadmap.md` (tick checklist)
+
+---
+
+## 08) "Phase B DB (Sequelize, option C)"
+
+- Trang thai: DONE
+- Da lam:
+  - Tao migration schema 11 bang + index toi thieu.
+  - Cai `sequelize`, `mysql2`, `sequelize-cli`.
+  - Them script migrate.
+  - Chay migrate thanh cong.
+- Files tao/sua:
+  - `database/migrations/20260327100000-create-phase-b-schema.js`
+  - `database/migrations/20260327101000-add-phase-b-indexes.js`
+  - `backend/config/config.js`
+  - `backend/package.json`
+  - `.env` (tao theo thong tin DB ban cung cap)
+  - `.cursor/skills/my-learn-e-project/reference-roadmap.md` (tick checklist)
+
+---
+
+## 09) "Phase C Auth"
+
+- Trang thai: DONE
+- Da lam:
+  - User model + auth service (`bcrypt`, `jwt`).
+  - Bearer auth middleware.
+  - Route `register/login`.
+  - Protect route: vocabulary/review/errors.
+- Files tao/sua:
+  - `backend/src/models/user.model.js`
+  - `backend/src/repositories/user.repository.js`
+  - `backend/src/services/auth.service.js`
+  - `backend/src/controllers/auth.controller.js`
+  - `backend/src/middlewares/auth.middleware.js`
+  - `backend/src/routes/auth.route.js`
+  - `backend/src/routes/vocabulary.route.js`
+  - `backend/src/routes/review.route.js`
+  - `backend/src/routes/error.route.js`
+  - `backend/src/app.js`
+  - `backend/package.json`
+  - `.cursor/skills/my-learn-e-project/reference-roadmap.md` (tick checklist)
+
+---
+
+## 10) "Moi API phai co Swagger + OpenAPI 3.0"
+
+- Trang thai: DONE
+- Da lam:
+  - Tao OpenAPI 3.0 spec.
+  - Bat Swagger UI va endpoint JSON spec.
+  - Cap nhat rule bat buoc API docs.
+- Files tao/sua:
+  - `backend/src/docs/openapi.yaml`
+  - `backend/src/app.js` (`/api/docs`, `/api/openapi.json`)
+  - `.cursor/rules/agent-memory-workflow.mdc`
+
+---
+
+## 11) "Toi muon dung nodemon"
+
+- Trang thai: DONE
+- Da lam:
+  - Cai `nodemon`.
+  - Script `dev` dung nodemon.
+- Files tao/sua:
+  - `backend/package.json`
+
+---
+
+## 12) "Phase D Vocabulary & content lam tiep"
+
+- Trang thai: DONE
+- Da lam (bat buoc):
+  - CRUD vocabulary.
+  - Link topic qua `vocabulary_topic_map`.
+  - Validators create/update.
+- Da lam (optional):
+  - `collocations` + `word_family` (migration + API + docs).
+- Files tao/sua:
+  - `backend/src/models/vocabulary.model.js`
+  - `backend/src/models/vocabulary-topic-map.model.js`
+  - `backend/src/repositories/vocabulary.repository.js`
+  - `backend/src/services/vocabulary.service.js`
+  - `backend/src/controllers/vocabulary.controller.js`
+  - `backend/src/validators/vocabulary.validator.js`
+  - `backend/src/routes/vocabulary.route.js`
+  - `database/migrations/20260327103000-add-collocations-and-word-family.js`
+  - `backend/src/models/collocation.model.js`
+  - `backend/src/models/word-family.model.js`
+  - `backend/src/repositories/content.repository.js`
+  - `backend/src/services/content.service.js`
+  - `backend/src/controllers/content.controller.js`
+  - `backend/src/validators/content.validator.js`
+  - `backend/src/docs/openapi.yaml` (update them path/schema moi)
+  - `backend/config/config.js` (fix load `.env` khi migrate)
+  - `.cursor/skills/my-learn-e-project/reference-roadmap.md` (tick checklist)
+
+---
+
+## 13) "Note lai nhung gi them moi chua co trong tai lieu"
+
+- Trang thai: DONE
+- Da lam:
+  - Them section notes ngoai roadmap trong file roadmap.
+- Files tao/sua:
+  - `.cursor/skills/my-learn-e-project/reference-roadmap.md`
+
+---
+
+## Cach su dung file note nay
+
+- Moi yeu cau moi: them 1 section moi o cuoi file.
+- Moi section nen co:
+  - cau hoi/yeu cau
+  - trang thai
+  - da lam gi
+  - file tao/sua
+

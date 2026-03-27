@@ -305,6 +305,76 @@ Muc dich: ghi lai nhung yeu cau ban da giao va nhung gi da duoc tao/sua de de to
 
 ---
 
+## 18) "Phase H - Web admin React"
+
+- Trang thai: DONE (MVP scaffold + pages + extras)
+- Da lam:
+  - Scaffold `web-admin` voi React + Vite.
+  - Week 1: layout + routes + sidebar + auth guard + login page + axios interceptor.
+  - Week 2: dashboard + vocabulary manager (table/form/search/pagination).
+  - Week 3: review queue page + error notebook page.
+  - Week 4: topic page scaffold.
+  - Extra:
+    - Bulk CSV import (word, meaning, topic IDs)
+    - Ant Design Table cho man hinh du lieu nang.
+  - Build web-admin thanh cong.
+- Files tao/sua:
+  - `web-admin/package.json`
+  - `web-admin/vite.config.js`
+  - `web-admin/index.html`
+  - `web-admin/src/main.jsx`
+  - `web-admin/src/App.jsx`
+  - `web-admin/src/styles.css`
+  - `web-admin/src/services/api.js`
+  - `web-admin/src/layouts/AdminLayout.jsx`
+  - `web-admin/src/routes/index.jsx`
+  - `web-admin/src/pages/LoginPage.jsx`
+  - `web-admin/src/pages/DashboardPage.jsx`
+  - `web-admin/src/pages/VocabularyPage.jsx`
+  - `web-admin/src/pages/ReviewPage.jsx`
+  - `web-admin/src/pages/ErrorPage.jsx`
+  - `web-admin/src/pages/TopicPage.jsx`
+  - `.cursor/skills/my-learn-e-project/reference-roadmap.md` (tick extras)
+
+---
+
+## 19) "Tiep (Phase I - Flutter mobile)"
+
+- Trang thai: DONE (scaffold MVP)
+- Da lam:
+  - Tao `mobile-app` Flutter project scaffold.
+  - Dung `Riverpod + Dio + go_router`.
+  - Flow co san:
+    - Splash -> Login -> Home
+    - Review screen (rating Again/Hard/Good/Easy + submit)
+    - Error notebook screen
+    - Topic screen
+    - Daily summary screen
+    - Profile + logout
+  - Tao reusable bottom navigation + progress card.
+  - Cap nhat roadmap tick cho Week 1-5 (scaffold level).
+- Files tao/sua:
+  - `mobile-app/pubspec.yaml`
+  - `mobile-app/lib/main.dart`
+  - `mobile-app/lib/routes/app_router.dart`
+  - `mobile-app/lib/providers/auth_provider.dart`
+  - `mobile-app/lib/services/api_client.dart`
+  - `mobile-app/lib/services/review_service.dart`
+  - `mobile-app/lib/models/review_item.dart`
+  - `mobile-app/lib/widgets/app_bottom_nav.dart`
+  - `mobile-app/lib/widgets/today_progress_card.dart`
+  - `mobile-app/lib/screens/splash/splash_screen.dart`
+  - `mobile-app/lib/screens/auth/login_screen.dart`
+  - `mobile-app/lib/screens/home/home_screen.dart`
+  - `mobile-app/lib/screens/review/review_screen.dart`
+  - `mobile-app/lib/screens/error_note/error_notebook_screen.dart`
+  - `mobile-app/lib/screens/topic/topic_screen.dart`
+  - `mobile-app/lib/screens/summary/daily_summary_screen.dart`
+  - `mobile-app/lib/screens/profile/profile_screen.dart`
+  - `.cursor/skills/my-learn-e-project/reference-roadmap.md`
+
+---
+
 ## Cach su dung file note nay
 
 - Moi yeu cau moi: them 1 section moi o cuoi file.

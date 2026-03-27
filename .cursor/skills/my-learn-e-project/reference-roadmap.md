@@ -81,8 +81,8 @@ Per **FULL DATABASE PRODUCTION VERSION**:
 
 Extra production items:
 
-- [ ] Bulk CSV import (word, meaning, topic)
-- [ ] Ant Design Table where heavy data
+- [x] Bulk CSV import (word, meaning, topic)
+- [x] Ant Design Table where heavy data
 
 ### Phase I — Flutter mobile (≈ 3–5 weeks)
 
@@ -93,6 +93,12 @@ Extra production items:
 **Week 5:** topic daily + speaking stub + daily summary  
 
 Tech: Riverpod, Dio, optional Hive later.
+
+- [x] Week 1 scaffold: splash, auth, home "today mission"
+- [x] Week 2 scaffold: review card flow + rating buttons
+- [x] Week 3 scaffold: 3-touch review guidance screen
+- [x] Week 4 scaffold: error notebook screen
+- [x] Week 5 scaffold: topic + daily summary screen
 
 ### Phase J — AI rule engine (≈ 2+ weeks, after core stable)
 

@@ -8,12 +8,12 @@ Companion to `SKILL.md`. Use for detailed planning and tick-through.
 
 ### Phase A — Foundation (≈ 1–2 weeks)
 
-- [ ] Git: `main` / `develop` / `feature/*`
-- [ ] `backend`: Express, `app.js` + `server.js`, Helmet, CORS, Morgan, JSON body
-- [ ] `config/database.js` (Sequelize + MySQL)
-- [ ] `.env.example`: `PORT`, `DB_*`, `JWT_SECRET`
-- [ ] Error middleware + unified JSON error shape
-- [ ] `database/migrations` — Knex or Sequelize migrations
+- [x] Git: `main` / `develop` / `feature/*`
+- [x] `backend`: Express, `app.js` + `server.js`, Helmet, CORS, Morgan, JSON body
+- [x] `config/database.js` (Sequelize + MySQL)
+- [x] `.env.example`: `PORT`, `DB_*`, `JWT_SECRET`
+- [x] Error middleware + unified JSON error shape
+- [x] `database/migrations` — Knex or Sequelize migrations
 
 ### Phase B — DB Phase 1 (10 tables)
 

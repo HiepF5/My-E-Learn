@@ -1,0 +1,24 @@
+---
+description: Enforce clarification and task completion tracking for all sessions
+alwaysApply: true
+---
+
+# Agent Memory Workflow
+
+- Follow project/user rules strictly before implementing.
+- If any requirement is unclear, ambiguous, or missing, ask the user before proceeding.
+- Do not guess hidden assumptions when they affect behavior, scope, data, or architecture.
+
+## Completion Tracking
+
+- Maintain a visible checklist for multi-step work.
+- After finishing each task, mark it as completed immediately.
+- Keep exactly one active task at a time when possible.
+- Before final response, verify all requested tasks are marked done.
+
+## Minimum confirmation pattern
+
+- Clarify first when needed.
+- Execute the task.
+- Mark the completed item.
+- Report status and next pending item (if any).

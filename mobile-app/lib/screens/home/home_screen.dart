@@ -23,6 +23,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   int newWordsTarget = 0;
   int topErrorsCount = 0;
   String topicTitle = 'Today Topic';
+  int _reviewQueueGoal = 20;
 
   @override
   void initState() {
@@ -43,6 +44,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         reviewDue = mission?.reviewDueCount ?? 0;
         newWordsTarget = mission?.newWordsTarget ?? 0;
         topErrorsCount = mission?.topErrorsCount ?? 0;
+        _reviewQueueGoal = mission?.reviewQueueTarget ?? 20;
         topicTitle = mission?.primaryTopicName?.trim().isNotEmpty == true
             ? mission!.primaryTopicName!.trim()
             : 'Today Topic';
@@ -53,6 +55,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         reviewDue = 0;
         newWordsTarget = 0;
         topErrorsCount = 0;
+        _reviewQueueGoal = 20;
       });
     }
   }
@@ -62,36 +65,42 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Today Mission')),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 88),
         children: [
           TodayProgressCard(
             reviewDue: reviewDue,
             newWords: newWordsTarget,
             topErrors: topErrorsCount,
+            reviewGoal: _reviewQueueGoal,
           ),
           const SizedBox(height: 12),
           Card(
             child: ListTile(
+              leading: Icon(
+                Icons.topic_rounded,
+                color: Theme.of(context).colorScheme.primary,
+              ),
               title: const Text('Today Topic'),
               subtitle: Text(topicTitle),
-              trailing: FilledButton(
+              trailing: FilledButton.tonal(
                 onPressed: () => context.go('/topic'),
                 child: const Text('Open'),
               ),
             ),
           ),
           const SizedBox(height: 12),
-          FilledButton(
-            onPressed: () => context.go('/review'),
-            child: const Text('Start Review'),
-          ),
-          const SizedBox(height: 8),
           OutlinedButton(
             onPressed: () => context.go('/vocabulary'),
             child: const Text('Browse vocabulary'),
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => context.go('/review'),
+        icon: const Icon(Icons.play_arrow_rounded),
+        label: const Text('Start Review'),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       bottomNavigationBar: const AppBottomNav(currentPath: '/'),
     );
   }

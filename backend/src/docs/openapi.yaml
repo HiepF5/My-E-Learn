@@ -119,6 +119,8 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/topics/today:
     get:
@@ -171,6 +173,8 @@ paths:
                 $ref: "#/components/schemas/TopicItemResponse"
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
     put:
@@ -197,6 +201,8 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
     delete:
@@ -215,6 +221,8 @@ paths:
                 $ref: "#/components/schemas/SuccessMessageOnly"
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
 
@@ -255,6 +263,8 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/vocabulary/sync:
     get:
@@ -343,6 +353,8 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/vocabulary/{id}/collocations/{collocationId}:
     delete:
@@ -362,6 +374,8 @@ paths:
                 $ref: "#/components/schemas/SuccessMessageOnly"
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
 
@@ -408,6 +422,8 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/vocabulary/{id}/word-family/{wordFamilyId}:
     delete:
@@ -453,6 +469,8 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
     delete:
@@ -471,6 +489,8 @@ paths:
                 $ref: "#/components/schemas/SuccessMessageOnly"
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
 
@@ -1462,6 +1482,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
+    Forbidden:
+      description: Forbidden — authenticated but missing required role (e.g. vocabulary/topic writes require ADMIN)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
     NotFound:
       description: Not found
       content:
@@ -2101,7 +2127,11 @@ components:
         email:
           type: string
           nullable: true
-      required: [id, username]
+        role:
+          type: string
+          enum: [USER, ADMIN]
+          description: USER = learner; ADMIN = content management (JWT includes this claim).
+      required: [id, username, role]
 
     RegisterResponse:
       type: object

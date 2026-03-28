@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:math';
 import '../../models/review_item.dart';
@@ -7,6 +8,7 @@ import '../../providers/auth_provider.dart';
 import '../../services/cache_service.dart';
 import '../../services/review_service.dart';
 import '../../widgets/app_bottom_nav.dart';
+import '../../theme/app_theme.dart';
 import '../../widgets/review_flashcard.dart';
 import '../../widgets/review_rating_bar.dart';
 
@@ -23,6 +25,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
   bool _loading = true;
   TouchHistoryItem? _touch;
   bool _submittingTouch = false;
+  bool _rateAck = false;
   Map<int, String> _wordLabelById = const {};
   List<VocabularyOption> _vocabularyOptions = const [];
   late final PageController _pageController;
@@ -108,6 +111,10 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
       selectedWordId: selectedWordId,
     );
     if (!mounted) return;
+    setState(() => _rateAck = true);
+    await Future.delayed(const Duration(milliseconds: 380));
+    if (!mounted) return;
+    setState(() => _rateAck = false);
     final next = _index + 1;
     setState(() {
       _index = next;
@@ -252,61 +259,113 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
       final step = _currentTouchStep(_touch);
       final canRate = step >= 4;
 
-      body = Column(
+      final scheme = Theme.of(context).colorScheme;
+      body = Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-            child: Text(
-              '${_index + 1} / ${_items.length}',
-              style: Theme.of(context).textTheme.titleSmall,
+          Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '${_index + 1} / ${_items.length}',
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
+                        Text(
+                          step <= 3 ? 'Bước $step / 3 · ${_stepLabel(step)}' : 'Sẵn sàng chấm điểm',
+                          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                                color: scheme.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(AppRadii.progress),
+                      child: LinearProgressIndicator(
+                        value: step <= 3 ? step / 3 : 1,
+                        minHeight: 6,
+                        backgroundColor: scheme.surfaceContainerHighest,
+                        color: step <= 3 ? scheme.primary : scheme.tertiary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: PageView.builder(
+                  controller: _pageController,
+                  physics: const NeverScrollableScrollPhysics(),
+                  onPageChanged: _onPageChanged,
+                  itemCount: _items.length,
+                  itemBuilder: (context, i) {
+                    final item = _items[i];
+                    final label = (item.word != null && item.word!.trim().isNotEmpty)
+                        ? item.word!.trim()
+                        : _wordForId(item.wordId);
+                    if (i != _index) {
+                      return ReviewFlashcard(
+                        wordId: item.wordId,
+                        wordLabel: label,
+                        meaning: item.meaning,
+                        exampleSentence: item.exampleSentence,
+                        phonetic: item.phonetic,
+                        subtitle: 'Next card after you rate',
+                        showTouch: false,
+                      );
+                    }
+                    return ReviewFlashcard(
+                      wordId: item.wordId,
+                      wordLabel: label,
+                      meaning: item.meaning,
+                      exampleSentence: item.exampleSentence,
+                      phonetic: item.phonetic,
+                      subtitle: 'SRS level ${item.level}',
+                      showTouch: true,
+                      touch: _touch,
+                      touchStep: step,
+                      stepLabel: _stepLabel,
+                      onCompleteTouchStep: () => _completeTouchStep(step),
+                      submittingTouch: _submittingTouch,
+                    );
+                  },
+                ),
+              ),
+              ReviewRatingBar(
+                enabled: canRate,
+                onAgain: () => _rate('Again', false),
+                onHard: () => _rate('Hard', true),
+                onGood: () => _rate('Good', true),
+                onEasy: () => _rate('Easy', true),
+              ),
+            ],
+          ),
+          if (_rateAck)
+            Positioned.fill(
+              child: IgnorePointer(
+                child: Center(
+                  child: Icon(
+                    Icons.check_circle_rounded,
+                    size: 88,
+                    color: scheme.primary.withValues(alpha: 0.92),
+                  )
+                      .animate()
+                      .scale(
+                        duration: 220.ms,
+                        curve: Curves.easeOutBack,
+                        begin: const Offset(0.35, 0.35),
+                        end: const Offset(1, 1),
+                      )
+                      .fadeIn(duration: 120.ms),
+                ),
+              ),
             ),
-          ),
-          Expanded(
-            child: PageView.builder(
-              controller: _pageController,
-              physics: const NeverScrollableScrollPhysics(),
-              onPageChanged: _onPageChanged,
-              itemCount: _items.length,
-              itemBuilder: (context, i) {
-                final item = _items[i];
-                final label = (item.word != null && item.word!.trim().isNotEmpty)
-                    ? item.word!.trim()
-                    : _wordForId(item.wordId);
-                if (i != _index) {
-                  return ReviewFlashcard(
-                    wordId: item.wordId,
-                    wordLabel: label,
-                    meaning: item.meaning,
-                    exampleSentence: item.exampleSentence,
-                    phonetic: item.phonetic,
-                    subtitle: 'Next card after you rate',
-                    showTouch: false,
-                  );
-                }
-                return ReviewFlashcard(
-                  wordId: item.wordId,
-                  wordLabel: label,
-                  meaning: item.meaning,
-                  exampleSentence: item.exampleSentence,
-                  phonetic: item.phonetic,
-                  subtitle: 'SRS level ${item.level}',
-                  showTouch: true,
-                  touch: _touch,
-                  touchStep: step,
-                  stepLabel: _stepLabel,
-                  onCompleteTouchStep: () => _completeTouchStep(step),
-                  submittingTouch: _submittingTouch,
-                );
-              },
-            ),
-          ),
-          ReviewRatingBar(
-            enabled: canRate,
-            onAgain: () => _rate('Again', false),
-            onHard: () => _rate('Hard', true),
-            onGood: () => _rate('Good', true),
-            onEasy: () => _rate('Easy', true),
-          ),
         ],
       );
     }

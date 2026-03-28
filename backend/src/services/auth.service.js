@@ -8,6 +8,7 @@ const sanitizeUser = (user) => ({
   id: user.id,
   username: user.username,
   email: user.email,
+  role: user.role || "USER",
 });
 
 const register = async ({ username, email, password }) => {
@@ -63,8 +64,9 @@ const login = async ({ username, email, password }) => {
     throw error;
   }
 
+  const role = user.role || "USER";
   const token = jwt.sign(
-    { userId: user.id, username: user.username, email: user.email },
+    { userId: user.id, username: user.username, email: user.email, role },
     process.env.JWT_SECRET,
     { expiresIn: "7d" }
   );

@@ -1,5 +1,7 @@
 const router = require("express").Router();
+const { allowRole } = require("../middlewares/role.middleware");
 const topicController = require("../controllers/topic.controller");
+const requireAdmin = allowRole("ADMIN");
 const {
   validateCreate,
   validateUpdate,
@@ -9,8 +11,8 @@ const {
 router.get("/today", topicController.getToday);
 router.get("/", topicController.list);
 router.get("/:id", validateIdParam, topicController.getById);
-router.post("/", validateCreate, topicController.create);
-router.put("/:id", validateUpdate, topicController.update);
-router.delete("/:id", validateIdParam, topicController.remove);
+router.post("/", requireAdmin, validateCreate, topicController.create);
+router.put("/:id", requireAdmin, validateUpdate, topicController.update);
+router.delete("/:id", requireAdmin, validateIdParam, topicController.remove);
 
 module.exports = router;

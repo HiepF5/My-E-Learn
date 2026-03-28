@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Alert, Button, Card, Form, Input, Typography } from "antd";
 import api from "../services/api";
 
-function LoginPage() {
+export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -14,13 +14,13 @@ function LoginPage() {
       setError("");
       const res = await api.post("/auth/login", values);
       const user = res.data?.data?.user;
-      if (user?.role !== "ADMIN") {
-        setError("Web admin requires an account with role ADMIN. Use seed user `admin` / `admin123` after npm run seed:demo.");
+      if (!user) {
+        setError("Invalid response");
         return;
       }
       localStorage.setItem("token", res.data.data.token);
-      localStorage.setItem("userRole", user.role);
-      navigate("/");
+      localStorage.setItem("userRole", user.role || "USER");
+      navigate("/learn/dashboard");
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
     } finally {
@@ -29,9 +29,20 @@ function LoginPage() {
   };
 
   return (
-    <div className="center-page">
-      <Card style={{ width: 420 }}>
-        <Typography.Title level={3}>Web Admin Login</Typography.Title>
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "#F6FBF7",
+      }}
+    >
+      <Card className="learn-card" style={{ width: 420 }}>
+        <Typography.Title level={3}>Learner login</Typography.Title>
+        <Typography.Paragraph type="secondary" style={{ marginTop: -8 }}>
+          Same API as mobile. Use demo learner <code>demo</code> / <code>demo123</code> after seed.
+        </Typography.Paragraph>
         {error ? <Alert type="error" message={error} showIcon style={{ marginBottom: 16 }} /> : null}
         <Form layout="vertical" onFinish={onFinish}>
           <Form.Item label="Username" name="username" rules={[{ required: true }]}>
@@ -48,5 +59,3 @@ function LoginPage() {
     </div>
   );
 }
-
-export default LoginPage;

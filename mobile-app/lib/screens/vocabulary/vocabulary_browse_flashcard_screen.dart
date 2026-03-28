@@ -6,6 +6,7 @@ import '../../models/vocabulary_row.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/cache_service.dart';
 import '../../services/vocabulary_service.dart';
+import '../../widgets/flip_word_card.dart';
 
 /// Browse-only flashcards: swipe between words; no SRS grading (Quizlet-style preview).
 class VocabularyBrowseFlashcardScreen extends ConsumerStatefulWidget {
@@ -79,7 +80,7 @@ class _VocabularyBrowseFlashcardScreenState extends ConsumerState<VocabularyBrow
                         itemCount: _rows.length,
                         onPageChanged: (i) => setState(() => _index = i),
                         itemBuilder: (context, i) {
-                          return _BrowseFlipCard(row: _rows[i]);
+                          return _BrowseFlipPage(row: _rows[i]);
                         },
                       ),
                     ),
@@ -88,7 +89,9 @@ class _VocabularyBrowseFlashcardScreenState extends ConsumerState<VocabularyBrow
                       child: Text(
                         'Swipe to browse. This does not affect your review schedule.',
                         textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.black54),
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            ),
                       ),
                     ),
                   ],
@@ -97,102 +100,42 @@ class _VocabularyBrowseFlashcardScreenState extends ConsumerState<VocabularyBrow
   }
 }
 
-class _BrowseFlipCard extends StatefulWidget {
-  const _BrowseFlipCard({required this.row});
+class _BrowseFlipPage extends StatelessWidget {
+  const _BrowseFlipPage({required this.row});
 
   final VocabularyRow row;
 
   @override
-  State<_BrowseFlipCard> createState() => _BrowseFlipCardState();
-}
-
-class _BrowseFlipCardState extends State<_BrowseFlipCard> {
-  bool _showBack = false;
-
-  @override
-  void didUpdateWidget(covariant _BrowseFlipCard oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.row.id != widget.row.id) {
-      _showBack = false;
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final r = widget.row;
+    final r = row;
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Card(
-        elevation: 2,
-        child: InkWell(
-          onTap: () => setState(() => _showBack = !_showBack),
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 260),
-              switchInCurve: Curves.easeOutCubic,
-              switchOutCurve: Curves.easeInCubic,
-              transitionBuilder: (child, anim) {
-                final slide = Tween<Offset>(
-                  begin: const Offset(0, 0.05),
-                  end: Offset.zero,
-                ).animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic));
-                return FadeTransition(
-                  opacity: anim,
-                  child: SlideTransition(position: slide, child: child),
-                );
-              },
-              child: _showBack ? _back(context, r) : _front(context, r),
-            ),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            children: [
+              Expanded(
+                child: FlipWordCard(
+                  flipKey: r.id,
+                  word: r.word,
+                  phonetic: r.phonetic,
+                  meaning: r.meaning,
+                  exampleSentence: r.exampleSentence,
+                  minHeight: 280,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Chạm thẻ để lật',
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+              ),
+            ],
           ),
         ),
       ),
-    );
-  }
-
-  Widget _front(BuildContext context, VocabularyRow r) {
-    return Column(
-      key: ValueKey('f-${r.id}'),
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(
-          r.word,
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w600),
-        ),
-        const SizedBox(height: 12),
-        Text(
-          'Tap to show meaning',
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Colors.black45),
-        ),
-      ],
-    );
-  }
-
-  Widget _back(BuildContext context, VocabularyRow r) {
-    final ph = r.phonetic?.trim();
-    final meaning = r.meaning?.trim();
-    final ex = r.exampleSentence?.trim();
-    return Column(
-      key: ValueKey('b-${r.id}'),
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        if (ph != null && ph.isNotEmpty)
-          Text(ph, textAlign: TextAlign.center, style: Theme.of(context).textTheme.titleSmall),
-        if (ph != null && ph.isNotEmpty) const SizedBox(height: 8),
-        Text(
-          (meaning != null && meaning.isNotEmpty) ? meaning : 'No meaning',
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.bodyLarge,
-        ),
-        if (ex != null && ex.isNotEmpty) ...[
-          const SizedBox(height: 12),
-          Text(ex, textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodyMedium),
-        ],
-      ],
     );
   }
 }

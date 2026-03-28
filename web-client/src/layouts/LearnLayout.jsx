@@ -33,7 +33,7 @@ export default function LearnLayout() {
     <Layout style={{ minHeight: "100vh" }}>
       <Sider width={220} theme="light" style={{ borderRight: "1px solid rgba(0,0,0,0.06)" }}>
         <div className="learn-brand" style={{ background: "#7BC47F" }}>
-          MY LEARN E
+          MY LEARN E — Learn
         </div>
         <Menu mode="inline" selectedKeys={[location.pathname]} items={items} style={{ borderRight: 0 }} />
       </Sider>

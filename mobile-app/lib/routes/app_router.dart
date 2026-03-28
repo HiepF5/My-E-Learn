@@ -14,6 +14,7 @@ import '../screens/streak/streak_screen.dart';
 import '../screens/learning/learning_lab_screen.dart';
 import '../screens/splash/splash_screen.dart';
 import '../screens/summary/daily_summary_screen.dart';
+import '../screens/weak_words/weak_words_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final auth = ref.watch(authProvider);
@@ -38,6 +39,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return VocabularyDetailScreen(wordId: id);
         },
       ),
+      GoRoute(path: '/weak-words', builder: (_, __) => const WeakWordsScreen()),
       GoRoute(path: '/vocabulary', builder: (_, __) => const VocabularyListScreen()),
       GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen()),
       GoRoute(path: '/streak', builder: (_, __) => const StreakScreen()),

@@ -25,6 +25,8 @@ tags:
   - name: AI Feedback
   - name: Devices
   - name: Learning
+  - name: Me
+  - name: Favorites
 paths:
   /health:
     get:
@@ -289,6 +291,198 @@ paths:
                 $ref: "#/components/schemas/VocabularySyncResponse"
         "401":
           $ref: "#/components/responses/Unauthorized"
+
+  /api/me/learning-state:
+    get:
+      tags: [Me]
+      summary: Get learning session hints (resume review)
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Current saved state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LearningStateResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    patch:
+      tags: [Me]
+      summary: Update learning session hints
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LearningStatePatchRequest"
+      responses:
+        "200":
+          description: Updated state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LearningStateResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/favorites:
+    get:
+      tags: [Favorites]
+      summary: List favorite words with labels
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Favorites list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FavoriteListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      tags: [Favorites]
+      summary: Add word to favorites
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [word_id]
+              properties:
+                word_id:
+                  type: integer
+      responses:
+        "201":
+          description: Created or already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessDataObject"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/favorites/check/{wordId}:
+    get:
+      tags: [Favorites]
+      summary: Check if word is favorited
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: wordId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Favorite flag
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FavoriteCheckResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/favorites/{wordId}:
+    delete:
+      tags: [Favorites]
+      summary: Remove word from favorites
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: wordId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Removed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessMessageOnly"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/vocabulary/{id}/note:
+    get:
+      tags: [Vocabulary]
+      summary: Get personal note for a word
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/VocabularyId"
+      responses:
+        "200":
+          description: Note payload (null text if none)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VocabularyNoteResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags: [Vocabulary]
+      summary: Save personal note (empty string deletes)
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/VocabularyId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VocabularyNotePutRequest"
+      responses:
+        "200":
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VocabularyNoteResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [Vocabulary]
+      summary: Delete personal note
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/VocabularyId"
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessMessageOnly"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /api/vocabulary/{id}:
     get:
@@ -2060,6 +2254,118 @@ components:
         message:
           type: string
       required: [success, data, message]
+
+    SuccessDataObject:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          additionalProperties: true
+        message:
+          type: string
+      required: [success, data, message]
+
+    LearningState:
+      type: object
+      properties:
+        last_review_word_id:
+          type: integer
+          nullable: true
+        last_screen:
+          type: string
+          nullable: true
+
+    LearningStateResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: "#/components/schemas/LearningState"
+        message:
+          type: string
+      required: [success, data, message]
+
+    LearningStatePatchRequest:
+      type: object
+      properties:
+        last_review_word_id:
+          type: integer
+          nullable: true
+        last_screen:
+          type: string
+          nullable: true
+
+    FavoriteItem:
+      type: object
+      properties:
+        word_id:
+          type: integer
+        word:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    FavoriteListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/FavoriteItem"
+        message:
+          type: string
+      required: [success, data, message]
+
+    FavoriteCheckResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            is_favorite:
+              type: boolean
+        message:
+          type: string
+      required: [success, data, message]
+
+    VocabularyNote:
+      type: object
+      properties:
+        note_text:
+          type: string
+          nullable: true
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    VocabularyNoteResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: "#/components/schemas/VocabularyNote"
+        message:
+          type: string
+      required: [success, data, message]
+
+    VocabularyNotePutRequest:
+      type: object
+      properties:
+        note_text:
+          type: string
+          description: Empty string removes the note
+      required: [note_text]
 
     SuccessArray:
       type: object

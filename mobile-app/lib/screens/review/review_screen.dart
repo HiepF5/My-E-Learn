@@ -1,11 +1,15 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'dart:math';
 import '../../models/review_item.dart';
 import '../../models/touch_history_item.dart';
 import '../../providers/auth_provider.dart';
+import '../../services/api_client.dart';
 import '../../services/cache_service.dart';
+import '../../services/learning_state_service.dart';
 import '../../services/review_service.dart';
 import '../../widgets/app_bottom_nav.dart';
 import '../../theme/app_theme.dart';
@@ -13,7 +17,10 @@ import '../../widgets/review_flashcard.dart';
 import '../../widgets/review_rating_bar.dart';
 
 class ReviewScreen extends ConsumerStatefulWidget {
-  const ReviewScreen({super.key});
+  const ReviewScreen({super.key, this.reviewLimit = 20});
+
+  /// Max cards from GET /review/today (Quick 3 min uses 5).
+  final int reviewLimit;
 
   @override
   ConsumerState<ReviewScreen> createState() => _ReviewScreenState();
@@ -26,31 +33,58 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
   TouchHistoryItem? _touch;
   bool _submittingTouch = false;
   bool _rateAck = false;
+  int _ratedThisSession = 0;
   Map<int, String> _wordLabelById = const {};
   List<VocabularyOption> _vocabularyOptions = const [];
   late final PageController _pageController;
+  late final ApiClient _api;
+
+  int get _safeLimit => widget.reviewLimit.clamp(1, 100);
 
   @override
   void initState() {
     super.initState();
+    _api = ref.read(apiClientProvider);
     _pageController = PageController();
     _load();
   }
 
   @override
   void dispose() {
+    _persistExitState();
     _pageController.dispose();
     super.dispose();
   }
 
+  void _persistExitState() {
+    if (_items.isEmpty || _index >= _items.length) return;
+    unawaited(
+      LearningStateService(_api).patch(
+        lastReviewWordId: _items[_index].wordId,
+        lastScreen: 'review',
+      ),
+    );
+  }
+
   Future<void> _load() async {
-    final service = ReviewService(ref.read(apiClientProvider), CacheService());
-    final data = await service.getTodayReview(limit: 20);
+    final service = ReviewService(_api, CacheService());
+    final learning = LearningStateService(_api);
+    unawaited(learning.patch(lastScreen: 'review'));
+
+    final data = await service.getTodayReview(limit: _safeLimit);
     final wordMap = await service.getVocabularyWordMapByIds(data.map((e) => e.wordId).toList());
     final vocabOptions = await service.getVocabularyOptions();
+    final ls = await learning.getState();
+
+    var startIndex = 0;
+    if (ls.lastReviewWordId != null && data.isNotEmpty) {
+      final j = data.indexWhere((e) => e.wordId == ls.lastReviewWordId);
+      if (j >= 0) startIndex = j;
+    }
+
     TouchHistoryItem? touch;
-    if (data.isNotEmpty) {
-      touch = await service.getTouchHistory(data.first.wordId);
+    if (data.isNotEmpty && startIndex < data.length) {
+      touch = await service.getTouchHistory(data[startIndex].wordId);
     }
     if (!mounted) return;
     setState(() {
@@ -59,11 +93,13 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
       _vocabularyOptions = vocabOptions;
       _touch = touch;
       _loading = false;
-      _index = 0;
+      _index = startIndex;
+      _ratedThisSession = 0;
     });
-    if (data.isNotEmpty && _pageController.hasClients) {
-      _pageController.jumpToPage(0);
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_pageController.hasClients || data.isEmpty) return;
+      _pageController.jumpToPage(startIndex);
+    });
   }
 
   Future<void> _loadTouchForCurrent() async {
@@ -72,7 +108,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
       setState(() => _touch = null);
       return;
     }
-    final service = ReviewService(ref.read(apiClientProvider), CacheService());
+    final service = ReviewService(_api, CacheService());
     final touch = await service.getTouchHistory(_items[_index].wordId);
     if (!mounted) return;
     setState(() => _touch = touch);
@@ -87,7 +123,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
     if (_items.isEmpty || _index >= _items.length) return;
     if (_submittingTouch) return;
     final current = _items[_index];
-    final service = ReviewService(ref.read(apiClientProvider), CacheService());
+    final service = ReviewService(_api, CacheService());
     setState(() => _submittingTouch = true);
     await service.patchTouchStep(wordId: current.wordId, touchStep: step, done: true);
     await _loadTouchForCurrent();
@@ -95,10 +131,33 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
     setState(() => _submittingTouch = false);
   }
 
+  Future<void> _showSessionCompleteDialog() async {
+    final n = _ratedThisSession;
+    if (!mounted) return;
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Hoàn thành phiên'),
+        content: Text(
+          n > 0
+              ? 'Bạn đã ôn $n từ trong phiên này. Hẹn gặp lại!'
+              : 'Bạn đã xong hàng đợi hôm nay.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _rate(String rating, bool correct) async {
     if (_items.isEmpty || _index >= _items.length) return;
     final current = _items[_index];
-    final service = ReviewService(ref.read(apiClientProvider), CacheService());
+    final service = ReviewService(_api, CacheService());
+    final learning = LearningStateService(_api);
     int? selectedWordId;
     if (!correct) {
       selectedWordId = await _askSelectedWordId();
@@ -115,18 +174,34 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
     await Future.delayed(const Duration(milliseconds: 380));
     if (!mounted) return;
     setState(() => _rateAck = false);
+
+    setState(() => _ratedThisSession++);
     final next = _index + 1;
-    setState(() {
-      _index = next;
-      _touch = null;
-    });
+
     if (next < _items.length) {
+      await learning.patch(
+        lastReviewWordId: _items[next].wordId,
+        lastScreen: 'review',
+      );
+      setState(() {
+        _index = next;
+        _touch = null;
+      });
       await _pageController.animateToPage(
         next,
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOutCubic,
       );
       await _loadTouchForCurrent();
+    } else {
+      await learning.patch(clearLastReviewWord: true, lastScreen: 'review');
+      await _showSessionCompleteDialog();
+      if (!mounted) return;
+      setState(() {
+        _index = next;
+        _touch = null;
+        _items = [];
+      });
     }
   }
 
@@ -254,7 +329,22 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
     if (_loading) {
       body = const Center(child: CircularProgressIndicator());
     } else if (_items.isEmpty || _index >= _items.length) {
-      body = const Center(child: Text('Done for today'));
+      body = Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text('Done for today'),
+            if (_ratedThisSession > 0) ...[
+              const SizedBox(height: 12),
+              Text(
+                'Đã ôn $_ratedThisSession từ trong phiên này',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ],
+          ],
+        ),
+      );
     } else {
       final step = _currentTouchStep(_touch);
       final canRate = step >= 4;
@@ -370,8 +460,9 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
       );
     }
 
+    final title = _safeLimit <= 5 ? 'Quick review' : 'Review';
     return Scaffold(
-      appBar: AppBar(title: const Text('Review')),
+      appBar: AppBar(title: Text(title)),
       body: body,
       bottomNavigationBar: const AppBottomNav(currentPath: '/review'),
     );

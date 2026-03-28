@@ -1,4 +1,11 @@
 {
+  "name": "my-e-learn-monorepo",
+  "private": true,
+  "scripts": {
+    "dev:admin": "npm run dev --prefix web-admin",
+    "dev:learn": "npm run dev --prefix web-client",
+    "dev:backend": "npm run dev --prefix backend"
+  },
   "dependencies": {
     "@modelcontextprotocol/server-filesystem": "^2026.1.14"
   }

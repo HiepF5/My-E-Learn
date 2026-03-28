@@ -39,9 +39,11 @@ export default function LoginPage() {
       }}
     >
       <Card className="learn-card" style={{ width: 420 }}>
-        <Typography.Title level={3}>Learner login</Typography.Title>
+        <Typography.Title level={3}>Learner web (not admin)</Typography.Title>
         <Typography.Paragraph type="secondary" style={{ marginTop: -8 }}>
-          Same API as mobile. Use demo learner <code>demo</code> / <code>demo123</code> after seed.
+          This app runs on <strong>http://localhost:5180</strong>. Admin panel is separate:{" "}
+          <strong>http://localhost:5173</strong>. Same API as mobile — use <code>demo</code> /{" "}
+          <code>demo123</code> after seed.
         </Typography.Paragraph>
         {error ? <Alert type="error" message={error} showIcon style={{ marginBottom: 16 }} /> : null}
         <Form layout="vertical" onFinish={onFinish}>

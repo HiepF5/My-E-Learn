@@ -37,6 +37,8 @@ app.get("/api/openapi.json", (req, res) => {
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(openapiSpec));
 
 app.use("/api/auth", require("./routes/auth.route"));
+app.use("/api/me", authMiddleware, require("./routes/me.route"));
+app.use("/api/favorites", authMiddleware, require("./routes/favorite.route"));
 app.use("/api/vocabulary", authMiddleware, require("./routes/vocabulary.route"));
 app.use("/api/topics", authMiddleware, require("./routes/topic.route"));
 app.use("/api/review", authMiddleware, require("./routes/review.route"));

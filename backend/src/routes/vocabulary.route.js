@@ -14,9 +14,13 @@ const {
   validateCollocationId,
   validateWordFamilyId,
 } = require("../validators/content.validator");
+const vocabularyNoteController = require("../controllers/vocabulary-note.controller");
 
 router.get("/", vocabularyController.list);
 router.get("/sync", vocabularyController.sync);
+router.get("/:id/note", validateVocabularyId, vocabularyNoteController.getNote);
+router.put("/:id/note", validateVocabularyId, vocabularyNoteController.putNote);
+router.delete("/:id/note", validateVocabularyId, vocabularyNoteController.deleteNote);
 router.get("/:id", vocabularyController.getById);
 router.post("/", requireAdmin, validateCreate, vocabularyController.create);
 router.put("/:id", requireAdmin, validateUpdate, vocabularyController.update);

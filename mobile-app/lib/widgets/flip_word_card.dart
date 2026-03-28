@@ -1,6 +1,7 @@
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
 
+import '../services/tts_service.dart';
 import '../theme/app_theme.dart';
 
 /// Rounded flashcard with horizontal flip (doc: front word + IPA + speaker; back meaning + example).
@@ -81,14 +82,11 @@ class FlipWordCard extends StatelessWidget {
                 ),
           ),
         ],
-        const SizedBox(height: 12),
-        Tooltip(
-          message: 'Phát âm (sắp có)',
-          child: Icon(
-            Icons.volume_up_rounded,
-            size: 28,
-            color: scheme.outline,
-          ),
+        const SizedBox(height: 8),
+        IconButton.filledTonal(
+          onPressed: () => TtsService.instance.speak(word),
+          icon: const Icon(Icons.volume_up_rounded),
+          tooltip: 'Phát âm',
         ),
       ],
     );
@@ -115,6 +113,15 @@ class FlipWordCard extends StatelessWidget {
               label: 'Example',
               body: ex,
               scheme: scheme,
+            ),
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.center,
+              child: TextButton.icon(
+                onPressed: () => TtsService.instance.speak(ex),
+                icon: const Icon(Icons.volume_up_rounded, size: 20),
+                label: const Text('Play example'),
+              ),
             ),
           ],
         ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../models/vocabulary_row.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/cache_service.dart';
@@ -69,6 +70,7 @@ class _VocabularyListScreenState extends ConsumerState<VocabularyListScreen> {
                     itemBuilder: (context, i) {
                       final r = filtered[i];
                       return ListTile(
+                        onTap: () => context.push('/vocabulary/${r.id}'),
                         title: Text(r.word),
                         subtitle: Text(
                           (r.meaning != null && r.meaning!.isNotEmpty)

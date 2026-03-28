@@ -29,6 +29,7 @@ Tài liệu này đối chiếu các mô tả trong thư mục `doc/` với tr�
 
 - CRUD vocabulary, gắn topic qua `topic_ids`; API collocations và word-family theo `vocabulary/:id` (`backend/src/routes/vocabulary.route.js`).
 - CRUD topics (`/api/topics`).
+- **`GET /api/topics/today`** — snapshot “nhiệm vụ hôm nay” (gộp rule-based plan + số review đến hạn + top errors); dùng chung cho mobile home/topic (`backend/src/routes/topic.route.js`, `backend/src/services/topic.service.js`).
 
 ### Review engine (lõi)
 
@@ -55,15 +56,16 @@ Tài liệu này đối chiếu các mô tả trong thư mục `doc/` với tr�
 
 ### Ghi nhận speaking / writing / feedback
 
-- API `speaking-records`, `writing-records`, `ai/feedback` (lưu bản ghi; feedback là nội dung client gửi lên, không tự sinh bởi model trong service).
+- API `speaking-records`, `writing-records`, `ai/feedback` (lưu bản ghi).
+- **Tùy chọn LLM:** `POST /api/ai/feedback` với `generate_llm: true` và `learner_text` gọi OpenAI khi có `OPENAI_API_KEY` (`backend/src/services/ai-feedback.service.js`, `backend/src/utils/openai-llm.js`).
 
 ### Web admin
 
-- Login, Dashboard (số liệu cơ bản), Vocabulary (kèm **Import CSV** — `web-admin/src/pages/VocabularyPage.jsx`), Review, Errors, Topics, Streak, Phase K (speaking/writing/feedback).
+- Login, Dashboard (số liệu cơ bản), Vocabulary (**Import CSV** + **Export CSV** — `web-admin/src/pages/VocabularyPage.jsx`), Review, Errors, Topics, Streak, Phase K (speaking/writing/feedback).
 
 ### Mobile
 
-- Splash, login, home “Today Mission”, review + 3-touch, error notebook, daily summary (Phase K), profile; `mobile-app/lib/services/cache_service.dart` dùng Hive cho cache/offline nhẹ.
+- Splash, login, home “Today Mission” (**bind `GET /api/topics/today`** qua `TodayMissionService`), màn topic động, **browse vocabulary** (`/vocabulary`), review + 3-touch (**PageView** + thanh Again–Easy), error notebook, daily summary (Phase K), profile; Hive cache (`mobile-app/lib/services/cache_service.dart`); stub FCM/offline (`push_reminders_stub.dart`, `offline_sync_service.dart`).
 
 ### CSDL
 
@@ -81,6 +83,7 @@ flowchart LR
   end
   subgraph partial [Partial_or_rule_only]
     AIPlan[AI_plan_rules]
+    LLM_feedback[OpenAI_feedback_optional]
     HiveCache[Hive_cache]
     PhaseK[Speaking_writing_UI]
   end
@@ -90,45 +93,40 @@ flowchart LR
   Admin --> API
   Mob --> API
   AIPlan --> API
+  LLM_feedback --> API
+  HiveCache --> Mob
 ```
 
 ---
 
 ## Chưa có hoặc mới một phần (so với `doc/`)
 
-### Khác endpoint / thiếu “today topic” API
+### Đường dẫn API khác tài liệu cũ
 
-- Doc gợi ý `GET /api/topic/today` và `POST /api/topic`; code hiện có CRUD `/api/topics` nhưng **không** có endpoint “topic hôm nay” riêng (`backend/src/routes/topic.route.js`).
+- Doc cũ gợi ý `GET /api/topic/today` (số ít); code dùng **`GET /api/topics/today`** (REST chuẩn dưới resource `topics`). `POST /api/topic` tương ứng **`POST /api/topics`**.
 
-### Import/export
+### Flashcard / UX ôn tập (mobile)
 
-- **Import CSV** có trên admin; **export** dữ liệu (CSV/backup) **chưa** thấy trong `web-admin/src/pages/VocabularyPage.jsx`.
+- Đã có **PageView** + **4 nút Again–Hard–Good–Easy** + thẻ từ (`review_flashcard.dart`, `review_rating_bar.dart`). **Chưa** có: lật thẻ (flip) ẩn/hiện nghĩa, **vuốt tay** chuyển từ (hiện dùng `NeverScrollableScrollPhysics` — chỉ chuyển trang sau khi chấm điểm), animation như doc minh họa.
 
-### Flashcard / UI học đầy đủ
+### Browse từ (mobile)
 
-- Doc mô tả flashcard flip, swipe `PageView`, 4 nút Again–Easy ở mobile; review screen hiện có luồng submit/rating và 3-touch nhưng **chưa** khớp hết mô tả UI “flashcard trung tâm + swipe” trong [FULL MOBILE LEARNING FLOW bằng Flutter.md](FULL%20MOBILE%20LEARNING%20FLOW%20bằng%20Flutter.md).
-- Trong doc có thư mục `screens/vocabulary/` cho flashcard browse; **không** có màn vocabulary/flashcard riêng tương ứng trong `mobile-app/lib/screens`.
-
-### Màn “One Topic Today” trên mobile
-
-- `mobile-app/lib/screens/topic/topic_screen.dart` vẫn **nội dung tĩnh**; không lấy từ `generate-today-plan` hay topics API.
-
-### Home mobile
-
-- `mobile-app/lib/screens/home/home_screen.dart` dùng số **cố định** cho new words / top errors và topic chữ “Daily Communication”, chưa bind đầy đủ API thật.
+- Đã có **danh sách + tìm kiếm** (`screens/vocabulary/vocabulary_list_screen.dart`). **Chưa** có: flashcard browse từng từ, collocations/word-family trong UI (API backend đã có).
 
 ### AI theo doc (LLM / Whisper / cá nhân hóa sâu)
 
-- Doc Phase 2–3: sentence correction, pronunciation feedback, topic generation, recommendation, knowledge graph — **chưa** có tích hợp LLM/Whisper trong backend; `ai_feedback` chỉ lưu trữ; không có bảng `ai_error_pattern` như mô tả dài trong [FULL AI PERSONAL LEARNING ENGINE.md](FULL%20AI%20PERSONAL%20LEARNING%20ENGINE.md).
-- “False master detector” có **logic rule** trong plan generator, không có trường `fake_known_count` riêng như doc SQL mẫu.
+- **Đã có (một phần):** gợi ý sửa/ghi nhận qua OpenAI cho `ai/feedback` khi bật `generate_llm` + `OPENAI_API_KEY`.
+- **Chưa có:** Whisper/phát âm, sinh chủ đề bằng LLM, recommendation đầy đủ, **knowledge graph**, migration **`ai_error_pattern`** như [FULL AI PERSONAL LEARNING ENGINE.md](FULL%20AI%20PERSONAL%20LEARNING%20ENGINE.md).
+- “False master detector” vẫn chỉ **rule** trong plan generator; **chưa** có cột `fake_known_count` trong DB như ví dụ SQL trong doc.
 
 ### Tính năng mở rộng trong [kế hoạch dự án app học tiếng Anh cá nhân.md](kế%20hoạch%20dự%20án%20app%20học%20tiếng%20Anh%20cá%20nhân.md)
 
-- Sentence mining; shadowing so sánh giọng; grammar micro 1/ngày; dictation nghe–gõ; heatmap **trên mobile** (admin đã có); speaking recorder chủ đề 30s như sản phẩm hoàn chỉnh — **chưa** hoặc chỉ mức form/ghi nhận.
+- Sentence mining; shadowing so sánh giọng; grammar micro 1/ngày; dictation nghe–gõ; heatmap **trên mobile** (admin đã có); speaking recorder chủ đề 30s như sản phẩm hoàn chỉnh — **chưa** hoặc chỉ mức form/ghi nhận (Phase K).
 
 ### Hạ tầng “sau này”
 
-- FCM nhắc học; offline-first sync toàn phần; SQLite/self-host như một số gợi ý trong doc — **chưa** (Hive mới hỗ trợ cache/patch tức thời).
+- **FCM** nhắc học — mới có **stub** (`mobile-app/lib/services/push_reminders_stub.dart`), chưa tích hợp Firebase.
+- **Offline-first sync** toàn phần — mới có Hive + queue review/touch + `OfflineSyncService.pushPendingLearningActions()`; chưa đồng bộ vocabulary hai chiều như doc “self-host/SQLite”.
 
 ### CSDL 24 bảng “đầy đủ”
 

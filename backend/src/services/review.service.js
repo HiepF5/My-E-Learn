@@ -1,5 +1,7 @@
+const { Op } = require("sequelize");
 const sequelize = require("../config/database");
 const reviewRepository = require("../repositories/review.repository");
+const Vocabulary = require("../models/vocabulary.model");
 const {
   REVIEW_LIMIT,
   INTERVALS,
@@ -46,7 +48,26 @@ const calculateNextReview = ({ level, easeFactor, answerResult, rating, response
 
 const getTodayReview = async (userId, limit = REVIEW_LIMIT.DEFAULT) => {
   const safeLimit = clamp(Number(limit) || REVIEW_LIMIT.DEFAULT, REVIEW_LIMIT.MIN, REVIEW_LIMIT.MAX);
-  return reviewRepository.findTodayDueReviews(userId, safeLimit);
+  const rows = await reviewRepository.findTodayDueReviews(userId, safeLimit);
+  if (!rows.length) return [];
+
+  const wordIds = [...new Set(rows.map((r) => Number(r.word_id)))];
+  const vocabs = await Vocabulary.findAll({
+    where: { id: { [Op.in]: wordIds } },
+  });
+  const byId = new Map(vocabs.map((v) => [Number(v.id), v]));
+
+  return rows.map((p) => {
+    const plain = p.get ? p.get({ plain: true }) : p;
+    const v = byId.get(Number(plain.word_id));
+    return {
+      ...plain,
+      word: v ? v.word : null,
+      meaning: v ? v.meaning : null,
+      example_sentence: v ? v.example_sentence : null,
+      phonetic: v ? v.phonetic : null,
+    };
+  });
 };
 
 const submitReview = async ({
@@ -71,6 +92,7 @@ const submitReview = async ({
           next_review: new Date(),
           correct_count: 0,
           wrong_count: 0,
+          fake_known_count: 0,
         },
         { transaction }
       );
@@ -91,6 +113,14 @@ const submitReview = async ({
     progress.next_review = new Date(Date.now() + next.intervalDays * 24 * 60 * 60 * 1000);
     if (answerResult) progress.correct_count += 1;
     else progress.wrong_count += 1;
+
+    if (
+      answerResult &&
+      Number.isInteger(responseTimeMs) &&
+      responseTimeMs > 6000
+    ) {
+      progress.fake_known_count = (Number(progress.fake_known_count) || 0) + 1;
+    }
 
     await reviewRepository.saveProgress(progress, { transaction });
 

@@ -831,6 +831,31 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
+  /api/ai/error-patterns:
+    get:
+      tags: [AI]
+      summary: List aggregated error-type patterns (from error notebook submissions)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+      responses:
+        "200":
+          description: Pattern rows ordered by error_count
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AiErrorPatternListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
   /api/streak/current:
     get:
       tags: [Streak]
@@ -1455,6 +1480,37 @@ components:
           type: string
       required: [success, data, message]
 
+    AiErrorPatternItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        pattern_name:
+          type: string
+        error_count:
+          type: integer
+        last_detected_at:
+          type: string
+          format: date-time
+          nullable: true
+      required: [id, user_id, pattern_name, error_count]
+
+    AiErrorPatternListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/AiErrorPatternItem"
+        message:
+          type: string
+      required: [success, data, message]
+
     GenerateTodayPlanRequest:
       type: object
       properties:
@@ -1985,6 +2041,22 @@ components:
           type: string
           format: date-time
           nullable: true
+        word:
+          type: string
+          nullable: true
+          description: Vocabulary headword (included on GET /api/review/today for flashcard UI)
+        meaning:
+          type: string
+          nullable: true
+        example_sentence:
+          type: string
+          nullable: true
+        phonetic:
+          type: string
+          nullable: true
+        fake_known_count:
+          type: integer
+          description: Incremented when a correct review took longer than 6s (false-master signal)
       required:
         [id, user_id, word_id, level, ease_factor, interval_days, correct_count, wrong_count]
 
@@ -1996,6 +2068,7 @@ components:
           example: true
         data:
           type: array
+          description: Review progress rows with optional vocabulary snapshot fields for each word
           items:
             $ref: "#/components/schemas/ReviewProgressItem"
         message:

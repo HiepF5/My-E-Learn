@@ -17,6 +17,7 @@ const ReviewProgress = sequelize.define(
     next_review: { type: DataTypes.DATE, allowNull: true },
     correct_count: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
     wrong_count: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+    fake_known_count: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
     last_review: { type: DataTypes.DATE, allowNull: true },
   },
   {

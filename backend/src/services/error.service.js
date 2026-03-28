@@ -1,8 +1,9 @@
 const errorRepository = require("../repositories/error.repository");
 const errorTagRepository = require("../repositories/error-tag.repository");
+const aiErrorPatternRepository = require("../repositories/ai-error-pattern.repository");
 
 const createError = async (userId, payload) => {
-  return errorRepository.createError({
+  const created = await errorRepository.createError({
     user_id: userId,
     error_type: payload.error_type || null,
     wrong_text: payload.wrong_text || null,
@@ -11,6 +12,16 @@ const createError = async (userId, payload) => {
     repeat_count: payload.repeat_count || 1,
     fixed: payload.fixed || false,
   });
+
+  if (payload.error_type) {
+    try {
+      await aiErrorPatternRepository.recordDetection(userId, String(payload.error_type));
+    } catch (_) {
+      /* non-fatal */
+    }
+  }
+
+  return created;
 };
 
 const listErrors = async (userId) => {

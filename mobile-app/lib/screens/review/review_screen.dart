@@ -269,16 +269,26 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
               itemCount: _items.length,
               itemBuilder: (context, i) {
                 final item = _items[i];
-                final label = _wordForId(item.wordId);
+                final label = (item.word != null && item.word!.trim().isNotEmpty)
+                    ? item.word!.trim()
+                    : _wordForId(item.wordId);
                 if (i != _index) {
                   return ReviewFlashcard(
+                    wordId: item.wordId,
                     wordLabel: label,
-                    subtitle: 'Swipe to this card to review',
+                    meaning: item.meaning,
+                    exampleSentence: item.exampleSentence,
+                    phonetic: item.phonetic,
+                    subtitle: 'Next card after you rate',
                     showTouch: false,
                   );
                 }
                 return ReviewFlashcard(
+                  wordId: item.wordId,
                   wordLabel: label,
+                  meaning: item.meaning,
+                  exampleSentence: item.exampleSentence,
+                  phonetic: item.phonetic,
                   subtitle: 'SRS level ${item.level}',
                   showTouch: true,
                   touch: _touch,

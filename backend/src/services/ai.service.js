@@ -2,6 +2,7 @@ const topicRepository = require("../repositories/topic.repository");
 const vocabularyRepository = require("../repositories/vocabulary.repository");
 const errorRepository = require("../repositories/error.repository");
 const reviewRepository = require("../repositories/review.repository");
+const aiErrorPatternRepository = require("../repositories/ai-error-pattern.repository");
 const { buildTodayPlan } = require("../ai/plan-generator");
 const weakWordService = require("./weak-word.service");
 const confusionPairService = require("./confusion-pair.service");
@@ -33,6 +34,12 @@ const generateTodayPlan = async (userId, payload = {}) => {
   };
 };
 
+const listErrorPatterns = async (userId, query = {}) => {
+  const limit = Math.min(Math.max(Number(query.limit) || 50, 1), 100);
+  return aiErrorPatternRepository.listByUser(userId, limit);
+};
+
 module.exports = {
   generateTodayPlan,
+  listErrorPatterns,
 };

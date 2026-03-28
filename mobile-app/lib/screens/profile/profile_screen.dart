@@ -19,6 +19,14 @@ class ProfileScreen extends ConsumerWidget {
           children: [
             Text('Username: ${auth.username ?? '-'}'),
             const SizedBox(height: 12),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.local_fire_department_outlined),
+              title: const Text('Streak & heatmap'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/streak'),
+            ),
+            const SizedBox(height: 12),
             FilledButton(
               onPressed: () async {
                 await ref.read(authProvider.notifier).logout();

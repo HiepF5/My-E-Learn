@@ -13,6 +13,20 @@ const generateTodayPlan = async (req, res, next) => {
   }
 };
 
+const listErrorPatterns = async (req, res, next) => {
+  try {
+    const data = await aiService.listErrorPatterns(req.user.userId, req.query || {});
+    return res.status(200).json({
+      success: true,
+      data,
+      message: "AI error patterns",
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 module.exports = {
   generateTodayPlan,
+  listErrorPatterns,
 };

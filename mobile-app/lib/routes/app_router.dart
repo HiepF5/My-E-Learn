@@ -7,7 +7,9 @@ import '../screens/review/review_screen.dart';
 import '../screens/error_note/error_notebook_screen.dart';
 import '../screens/topic/topic_screen.dart';
 import '../screens/vocabulary/vocabulary_list_screen.dart';
+import '../screens/vocabulary/vocabulary_detail_screen.dart';
 import '../screens/profile/profile_screen.dart';
+import '../screens/streak/streak_screen.dart';
 import '../screens/splash/splash_screen.dart';
 import '../screens/summary/daily_summary_screen.dart';
 
@@ -22,8 +24,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/review', builder: (_, __) => const ReviewScreen()),
       GoRoute(path: '/errors', builder: (_, __) => const ErrorNotebookScreen()),
       GoRoute(path: '/topic', builder: (_, __) => const TopicScreen()),
+      GoRoute(
+        path: '/vocabulary/:id',
+        builder: (context, state) {
+          final raw = state.pathParameters['id'];
+          final id = int.tryParse(raw ?? '') ?? 0;
+          return VocabularyDetailScreen(wordId: id);
+        },
+      ),
       GoRoute(path: '/vocabulary', builder: (_, __) => const VocabularyListScreen()),
       GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen()),
+      GoRoute(path: '/streak', builder: (_, __) => const StreakScreen()),
       GoRoute(path: '/summary', builder: (_, __) => const DailySummaryScreen()),
     ],
     redirect: (context, state) {

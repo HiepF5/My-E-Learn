@@ -4,6 +4,7 @@ class VocabularyRow {
     required this.word,
     this.meaning,
     this.exampleSentence,
+    this.phonetic,
     this.difficulty,
     this.topicIds = const [],
   });
@@ -12,6 +13,7 @@ class VocabularyRow {
   final String word;
   final String? meaning;
   final String? exampleSentence;
+  final String? phonetic;
   final int? difficulty;
   final List<int> topicIds;
 
@@ -22,6 +24,7 @@ class VocabularyRow {
       word: (json['word'] as String?)?.trim() ?? '',
       meaning: json['meaning'] as String?,
       exampleSentence: json['example_sentence'] as String?,
+      phonetic: json['phonetic'] as String?,
       difficulty: (json['difficulty'] as num?)?.toInt(),
       topicIds: rawTopics.map((e) => (e as num).toInt()).toList(),
     );

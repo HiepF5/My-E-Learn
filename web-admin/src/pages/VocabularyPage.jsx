@@ -13,7 +13,7 @@ import {
   Typography,
   Upload,
 } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
+import { DownloadOutlined, UploadOutlined } from "@ant-design/icons";
 import api from "../services/api";
 
 function VocabularyPage() {
@@ -112,6 +112,25 @@ function VocabularyPage() {
     return false;
   };
 
+  const handleCsvExport = () => {
+    const rows = filtered.map((r) => ({
+      id: r.id,
+      word: r.word,
+      meaning: r.meaning ?? "",
+      example_sentence: r.example_sentence ?? "",
+      difficulty: r.difficulty ?? "",
+      topic: (r.topic_ids || []).join("|"),
+    }));
+    const csv = Papa.unparse(rows);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `vocabulary-export-${Date.now()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const columns = [
     { title: "ID", dataIndex: "id", width: 70 },
     { title: "Word", dataIndex: "word" },
@@ -162,6 +181,9 @@ function VocabularyPage() {
         <Upload beforeUpload={handleCsvImport} showUploadList={false} accept=".csv">
           <Button icon={<UploadOutlined />}>Import CSV</Button>
         </Upload>
+        <Button icon={<DownloadOutlined />} onClick={handleCsvExport} disabled={filtered.length === 0}>
+          Export CSV
+        </Button>
       </Space>
       <Table
         rowKey="id"

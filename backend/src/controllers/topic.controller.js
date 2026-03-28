@@ -1,5 +1,18 @@
 const topicService = require("../services/topic.service");
 
+const getToday = async (req, res, next) => {
+  try {
+    const data = await topicService.getTodayMission(req.user.userId, req.query || {});
+    return res.status(200).json({
+      success: true,
+      data,
+      message: "Today mission",
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 const list = async (req, res, next) => {
   try {
     const data = await topicService.getAllTopics();
@@ -66,6 +79,7 @@ const remove = async (req, res, next) => {
 };
 
 module.exports = {
+  getToday,
   list,
   getById,
   create,

@@ -118,6 +118,40 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
+  /api/topics/today:
+    get:
+      tags: [Topics]
+      summary: Today mission (primary topic, plan counts, review due)
+      description: >-
+        Aggregates the rule-based today plan (same inputs as AI generate-today-plan) with live
+        review-due count and error-notebook summary for mobile home and topic screens.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: daily_target_words
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+        - name: review_cap
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      responses:
+        "200":
+          description: Today mission snapshot
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TodayMissionResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
   /api/topics/{id}:
     get:
       tags: [Topics]
@@ -1035,6 +1069,8 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "503":
+          description: LLM generation requested but OPENAI_API_KEY is not configured
 
 components:
   securitySchemes:
@@ -1370,6 +1406,9 @@ components:
 
     AiFeedbackCreateRequest:
       type: object
+      description: >-
+        Either provide feedback_text manually, or set generate_llm to true with learner_text to
+        generate feedback via OpenAI (requires OPENAI_API_KEY on the server).
       properties:
         source_type:
           type: string
@@ -1378,11 +1417,17 @@ components:
           type: integer
         feedback_text:
           type: string
+          description: Required when generate_llm is not true.
         suggestions:
           type: string
         model_name:
           type: string
-      required: [feedback_text]
+        generate_llm:
+          type: boolean
+          description: When true, learner_text is sent to the LLM and feedback_text is generated.
+        learner_text:
+          type: string
+          description: Learner content to review when generate_llm is true.
 
     AiFeedbackItemResponse:
       type: object
@@ -1561,6 +1606,50 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/TopicItem"
+        message:
+          type: string
+      required: [success, data, message]
+
+    TodayMission:
+      type: object
+      properties:
+        date:
+          type: string
+          example: "2026-03-28"
+        generated_at:
+          type: string
+          format: date-time
+        review_due_count:
+          type: integer
+        new_words_target:
+          type: integer
+          nullable: true
+        review_queue_target:
+          type: integer
+          nullable: true
+        touch_focus:
+          type: integer
+          nullable: true
+        top_errors_count:
+          type: integer
+        today_plan:
+          type: object
+          description: Rule-based plan payload (topic, counts, weak_word_ids, etc.)
+      required:
+        - date
+        - generated_at
+        - review_due_count
+        - top_errors_count
+        - today_plan
+
+    TodayMissionResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: "#/components/schemas/TodayMission"
         message:
           type: string
       required: [success, data, message]

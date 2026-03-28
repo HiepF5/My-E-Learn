@@ -6,6 +6,7 @@ const {
   validateIdParam,
 } = require("../validators/topic.validator");
 
+router.get("/today", topicController.getToday);
 router.get("/", topicController.list);
 router.get("/:id", validateIdParam, topicController.getById);
 router.post("/", validateCreate, topicController.create);

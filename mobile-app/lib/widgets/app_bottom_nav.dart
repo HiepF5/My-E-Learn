@@ -10,6 +10,7 @@ class AppBottomNav extends StatelessWidget {
     if (currentPath.startsWith('/review')) return 1;
     if (currentPath.startsWith('/errors')) return 2;
     if (currentPath.startsWith('/profile')) return 3;
+    if (currentPath.startsWith('/vocabulary')) return 0;
     return 0;
   }
 

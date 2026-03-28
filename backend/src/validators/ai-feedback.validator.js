@@ -13,13 +13,23 @@ const validateListQuery = (req, res, next) => {
 };
 
 const validateCreateAiFeedback = (req, res, next) => {
-  const { source_type, source_id, feedback_text, suggestions, model_name } = req.body || {};
+  const { source_type, source_id, feedback_text, suggestions, model_name, generate_llm, learner_text } =
+    req.body || {};
 
-  if (!feedback_text || typeof feedback_text !== "string" || !feedback_text.trim()) {
+  const useLlm = generate_llm === true || generate_llm === "true";
+  if (useLlm) {
+    if (!learner_text || typeof learner_text !== "string" || !learner_text.trim()) {
+      return res.status(400).json({
+        success: false,
+        data: null,
+        message: "learner_text is required when generate_llm is true",
+      });
+    }
+  } else if (!feedback_text || typeof feedback_text !== "string" || !feedback_text.trim()) {
     return res.status(400).json({
       success: false,
       data: null,
-      message: "feedback_text is required",
+      message: "feedback_text is required unless generate_llm is true with learner_text",
     });
   }
   if (source_type !== undefined && !ALLOWED_SOURCE_TYPES.includes(String(source_type).toLowerCase())) {

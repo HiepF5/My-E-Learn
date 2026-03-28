@@ -1,4 +1,5 @@
 const aiFeedbackRepository = require("../repositories/ai-feedback.repository");
+const { generateLearnerFeedback } = require("../utils/openai-llm");
 
 const ALLOWED_SOURCE_TYPES = ["speaking", "writing", "general"];
 
@@ -12,13 +13,28 @@ const createAiFeedback = async (userId, payload) => {
     throw error;
   }
 
+  const useLlm = payload.generate_llm === true || payload.generate_llm === "true";
+  let feedbackText = payload.feedback_text;
+  let suggestions = payload.suggestions || null;
+  let modelName = payload.model_name || null;
+
+  if (useLlm) {
+    const out = await generateLearnerFeedback({
+      learnerText: payload.learner_text,
+      sourceType,
+    });
+    feedbackText = out.feedbackText;
+    suggestions = suggestions || out.suggestions;
+    modelName = modelName || out.model;
+  }
+
   return aiFeedbackRepository.createAiFeedback({
     user_id: userId,
     source_type: sourceType,
     source_id: payload.source_id || null,
-    feedback_text: payload.feedback_text,
-    suggestions: payload.suggestions || null,
-    model_name: payload.model_name || null,
+    feedback_text: feedbackText,
+    suggestions,
+    model_name: modelName,
   });
 };
 

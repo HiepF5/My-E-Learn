@@ -7,6 +7,8 @@ import '../../providers/auth_provider.dart';
 import '../../services/cache_service.dart';
 import '../../services/review_service.dart';
 import '../../widgets/app_bottom_nav.dart';
+import '../../widgets/review_flashcard.dart';
+import '../../widgets/review_rating_bar.dart';
 
 class ReviewScreen extends ConsumerStatefulWidget {
   const ReviewScreen({super.key});
@@ -23,11 +25,19 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
   bool _submittingTouch = false;
   Map<int, String> _wordLabelById = const {};
   List<VocabularyOption> _vocabularyOptions = const [];
+  late final PageController _pageController;
 
   @override
   void initState() {
     super.initState();
+    _pageController = PageController();
     _load();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   Future<void> _load() async {
@@ -48,6 +58,9 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
       _loading = false;
       _index = 0;
     });
+    if (data.isNotEmpty && _pageController.hasClients) {
+      _pageController.jumpToPage(0);
+    }
   }
 
   Future<void> _loadTouchForCurrent() async {
@@ -60,6 +73,11 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
     final touch = await service.getTouchHistory(_items[_index].wordId);
     if (!mounted) return;
     setState(() => _touch = touch);
+  }
+
+  Future<void> _onPageChanged(int i) async {
+    setState(() => _index = i);
+    await _loadTouchForCurrent();
   }
 
   Future<void> _completeTouchStep(int step) async {
@@ -90,11 +108,19 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
       selectedWordId: selectedWordId,
     );
     if (!mounted) return;
+    final next = _index + 1;
     setState(() {
-      _index += 1;
+      _index = next;
       _touch = null;
     });
-    await _loadTouchForCurrent();
+    if (next < _items.length) {
+      await _pageController.animateToPage(
+        next,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOutCubic,
+      );
+      await _loadTouchForCurrent();
+    }
   }
 
   Future<int?> _askSelectedWordId() async {
@@ -160,14 +186,15 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
       return [currentWordId, ...fallback.take(3)];
     }
 
-    final topicSet = currentMeta.topicIds.toSet();
+    final meta = currentMeta;
+    final topicSet = meta.topicIds.toSet();
     final candidates = _vocabularyOptions.where((v) => v.id != currentWordId).toList();
 
     final sameTopic = candidates
         .where((v) => topicSet.isNotEmpty && v.topicIds.any(topicSet.contains))
         .toList();
     final closeDifficulty = candidates
-        .where((v) => (v.difficulty - currentMeta.difficulty).abs() <= 1)
+        .where((v) => (v.difficulty - meta.difficulty).abs() <= 1)
         .toList();
 
     final rnd = Random();
@@ -222,70 +249,55 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
     } else if (_items.isEmpty || _index >= _items.length) {
       body = const Center(child: Text('Done for today'));
     } else {
-      final item = _items[_index];
       final step = _currentTouchStep(_touch);
-      final canRate = step == 4;
-      body = Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  children: [
-                    Text('Word ID: ${item.wordId}', style: Theme.of(context).textTheme.headlineSmall),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Word: ${_wordForId(item.wordId)}',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    Text('Level: ${item.level}, Wrong: ${item.wrongCount}'),
-                    const SizedBox(height: 12),
-                    Text('3-touch current step: ${_stepLabel(step)}'),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Progress: '
-                      'R:${_touch?.touch1Done == true ? "x" : "-"} '
-                      'T:${_touch?.touch2Done == true ? "x" : "-"} '
-                      'S:${_touch?.touch3Done == true ? "x" : "-"}',
-                    ),
-                  ],
-                ),
-              ),
+      final canRate = step >= 4;
+
+      body = Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+            child: Text(
+              '${_index + 1} / ${_items.length}',
+              style: Theme.of(context).textTheme.titleSmall,
             ),
-            const SizedBox(height: 12),
-            if (!canRate)
-              FilledButton(
-                onPressed: _submittingTouch ? null : () => _completeTouchStep(step),
-                child: Text(_submittingTouch ? 'Saving...' : 'Complete ${_stepLabel(step)}'),
-              ),
-            if (!canRate) const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                OutlinedButton(
-                  onPressed: canRate ? () => _rate('Again', false) : null,
-                  child: const Text('Again'),
-                ),
-                OutlinedButton(
-                  onPressed: canRate ? () => _rate('Hard', true) : null,
-                  child: const Text('Hard'),
-                ),
-                FilledButton(
-                  onPressed: canRate ? () => _rate('Good', true) : null,
-                  child: const Text('Good'),
-                ),
-                FilledButton(
-                  onPressed: canRate ? () => _rate('Easy', true) : null,
-                  child: const Text('Easy'),
-                ),
-              ],
+          ),
+          Expanded(
+            child: PageView.builder(
+              controller: _pageController,
+              physics: const NeverScrollableScrollPhysics(),
+              onPageChanged: _onPageChanged,
+              itemCount: _items.length,
+              itemBuilder: (context, i) {
+                final item = _items[i];
+                final label = _wordForId(item.wordId);
+                if (i != _index) {
+                  return ReviewFlashcard(
+                    wordLabel: label,
+                    subtitle: 'Swipe to this card to review',
+                    showTouch: false,
+                  );
+                }
+                return ReviewFlashcard(
+                  wordLabel: label,
+                  subtitle: 'SRS level ${item.level}',
+                  showTouch: true,
+                  touch: _touch,
+                  touchStep: step,
+                  stepLabel: _stepLabel,
+                  onCompleteTouchStep: () => _completeTouchStep(step),
+                  submittingTouch: _submittingTouch,
+                );
+              },
             ),
-          ],
-        ),
+          ),
+          ReviewRatingBar(
+            enabled: canRate,
+            onAgain: () => _rate('Again', false),
+            onHard: () => _rate('Hard', true),
+            onGood: () => _rate('Good', true),
+            onEasy: () => _rate('Easy', true),
+          ),
+        ],
       );
     }
 

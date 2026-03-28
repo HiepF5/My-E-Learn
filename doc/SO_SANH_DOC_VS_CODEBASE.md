@@ -65,11 +65,11 @@ Tài liệu này đối chiếu các mô tả trong thư mục `doc/` với tr�
 
 ### Mobile
 
-- Splash, login, home “Today Mission” (**bind `GET /api/topics/today`** qua `TodayMissionService`), màn topic động, **browse vocabulary** (`/vocabulary`), review + 3-touch (**PageView** + thanh Again–Easy), error notebook, daily summary (Phase K), profile; Hive cache (`mobile-app/lib/services/cache_service.dart`); stub FCM/offline (`push_reminders_stub.dart`, `offline_sync_service.dart`).
+- Splash, login, home “Today Mission” (**bind `GET /api/topics/today`** qua `TodayMissionService`), màn topic động, **browse vocabulary** (`/vocabulary`), **chi tiết từ** (collocations/word-family qua API), **streak + heatmap** (`streak_screen.dart`), review + 3-touch (**PageView** + thanh Again–Easy), **tap-to-flip** trên thẻ ôn (`review_flashcard.dart`), error notebook, daily summary (Phase K), profile; Hive cache (`cache_service.dart`); stub FCM / offline nâng cấp dần (`push_reminders_stub.dart` hoặc FCM thật, `offline_sync_service.dart`).
 
 ### CSDL
 
-- Migration phase B tạo đủ các bảng lõi gần với doc DB production (users, user_settings, topics, vocabulary, maps, review_*, touch_history, error_*, daily_review_queue, v.v.) — xem `database/migrations/20260327100000-create-phase-b-schema.js`.
+- Migration phase B + collocations/word-family, error tags, streak, weak words, speaking/writing/ai_feedback, review_history `selected_word_id`, **`ai_error_patterns`** + cột **`fake_known_count`** trên `review_progress` — xem `database/migrations/` và [AUDIT_DB_VS_DOC.md](AUDIT_DB_VS_DOC.md).
 
 ```mermaid
 flowchart LR
@@ -105,32 +105,38 @@ flowchart LR
 
 - Doc cũ gợi ý `GET /api/topic/today` (số ít); code dùng **`GET /api/topics/today`** (REST chuẩn dưới resource `topics`). `POST /api/topic` tương ứng **`POST /api/topics`**.
 
+### Đã có gần đây (cập nhật so với bản so sánh cũ)
+
+- **Flip thẻ + nghĩa/ví dụ** trong review: `mobile-app/lib/widgets/review_flashcard.dart` (tap để lật).
+- **Chi tiết từ + collocations/word-family** trên mobile: `vocabulary_detail_screen.dart`.
+- **Heatmap / streak trên mobile:** `streak_screen.dart` (API streak đã có).
+- **DB:** bảng `ai_error_patterns`, cột `review_progress.fake_known_count` — migration `20260328140000-add-ai-error-pattern-and-fake-known.js`; API `GET /api/ai/error-patterns`.
+
 ### Flashcard / UX ôn tập (mobile)
 
-- Đã có **PageView** + **4 nút Again–Hard–Good–Easy** + thẻ từ (`review_flashcard.dart`, `review_rating_bar.dart`). **Chưa** có: lật thẻ (flip) ẩn/hiện nghĩa, **vuốt tay** chuyển từ (hiện dùng `NeverScrollableScrollPhysics` — chỉ chuyển trang sau khi chấm điểm), animation như doc minh họa.
+- Đã có **PageView** + **4 nút** + **flip**. **Chưa** (hoặc tùy chọn): **vuốt tay** chuyển thẻ *mà không chấm điểm SRS* (hiện `NeverScrollableScrollPhysics` — chỉ next sau grade); có thể bổ sung animation mượt hơn theo doc.
 
 ### Browse từ (mobile)
 
-- Đã có **danh sách + tìm kiếm** (`screens/vocabulary/vocabulary_list_screen.dart`). **Chưa** có: flashcard browse từng từ, collocations/word-family trong UI (API backend đã có).
+- Danh sách + tìm kiếm + chi tiết từ. **Có thể** bổ sung **chế độ flashcard browse** (lướt ôn xem, không ghi SRS) nếu muốn giống Quizlet browse-only.
 
 ### AI theo doc (LLM / Whisper / cá nhân hóa sâu)
 
-- **Đã có (một phần):** gợi ý sửa/ghi nhận qua OpenAI cho `ai/feedback` khi bật `generate_llm` + `OPENAI_API_KEY`.
-- **Chưa có:** Whisper/phát âm, sinh chủ đề bằng LLM, recommendation đầy đủ, **knowledge graph**, migration **`ai_error_pattern`** như [FULL AI PERSONAL LEARNING ENGINE.md](FULL%20AI%20PERSONAL%20LEARNING%20ENGINE.md).
-- “False master detector” vẫn chỉ **rule** trong plan generator; **chưa** có cột `fake_known_count` trong DB như ví dụ SQL trong doc.
+- **Đã có (một phần):** OpenAI qua `ai/feedback`; rule engine + `ai_error_patterns` + `fake_known_count` (slow-response heuristic).
+- **Chưa có / vision:** Whisper/STT production, phát âm scoring, sinh chủ đề LLM đầy đủ, **knowledge graph** mở rộng — xem Phase 5–6 roadmap và [AUDIT_DB_VS_DOC.md](AUDIT_DB_VS_DOC.md).
 
 ### Tính năng mở rộng trong [kế hoạch dự án app học tiếng Anh cá nhân.md](kế%20hoạch%20dự%20án%20app%20học%20tiếng%20Anh%20cá%20nhân.md)
 
-- Sentence mining; shadowing so sánh giọng; grammar micro 1/ngày; dictation nghe–gõ; heatmap **trên mobile** (admin đã có); speaking recorder chủ đề 30s như sản phẩm hoàn chỉnh — **chưa** hoặc chỉ mức form/ghi nhận (Phase K).
+- Sentence mining; shadowing; grammar micro; dictation; speaking 30s “productized” — triển khai theo từng phase (API + mobile); Phase K hiện mức foundation.
 
-### Hạ tầng “sau này”
+### Hạ tầng
 
-- **FCM** nhắc học — mới có **stub** (`mobile-app/lib/services/push_reminders_stub.dart`), chưa tích hợp Firebase.
-- **Offline-first sync** toàn phần — mới có Hive + queue review/touch + `OfflineSyncService.pushPendingLearningActions()`; chưa đồng bộ vocabulary hai chiều như doc “self-host/SQLite”.
+- **FCM:** backend `POST/DELETE/GET /api/devices/tokens` + bảng `user_device_tokens`; mobile `push_reminders_service.dart` + `firebase_options.dart` (chạy `flutterfire configure` và thêm `google-services` / iOS plist).
+- **Offline vocabulary:** `GET /api/vocabulary/sync?since=` + merge Hive trong `offline_sync_service.dart`.
 
-### CSDL 24 bảng “đầy đủ”
+### CSDL doc 20 bảng + mở rộng
 
-- Doc liệt kê ~24 bảng mở rộng; repo có migration phase B + bổ sung (streak, weak words, AI feedback, v.v.) — cần đối chiếu thủ công nếu muốn khớp **từng** bảng future trong doc (ví dụ một số bảng AI-only có thể chưa tạo).
+- Đối chiếu có hệ thống: [AUDIT_DB_VS_DOC.md](AUDIT_DB_VS_DOC.md).
 
 ---
 

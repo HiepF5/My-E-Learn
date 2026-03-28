@@ -69,10 +69,33 @@ const removeVocabulary = async (id) => {
   }
 };
 
+const syncVocabularyDelta = async (sinceIso) => {
+  let since = null;
+  if (sinceIso) {
+    const d = new Date(String(sinceIso));
+    if (!Number.isNaN(d.getTime())) since = d;
+  }
+  const list = await vocabularyRepository.findVocabularyUpdatedAfter(since);
+  const items = await Promise.all(list.map((item) => withTopicIds(item)));
+  let maxUpdated = null;
+  for (const it of items) {
+    const u = it.updated_at ? new Date(it.updated_at) : null;
+    if (u && !Number.isNaN(u.getTime())) {
+      if (!maxUpdated || u > maxUpdated) maxUpdated = u;
+    }
+  }
+  return {
+    items,
+    sync_cursor: maxUpdated ? maxUpdated.toISOString() : new Date().toISOString(),
+    full_sync: !since,
+  };
+};
+
 module.exports = {
   createVocabulary,
   getAllVocabulary,
   getVocabularyById,
   updateVocabulary,
   removeVocabulary,
+  syncVocabularyDelta,
 };

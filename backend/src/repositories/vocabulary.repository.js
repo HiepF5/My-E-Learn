@@ -1,4 +1,4 @@
-const { fn, col } = require("sequelize");
+const { fn, col, Op } = require("sequelize");
 const Vocabulary = require("../models/vocabulary.model");
 const VocabularyTopicMap = require("../models/vocabulary-topic-map.model");
 
@@ -8,6 +8,16 @@ const createVocabulary = async (payload, options = {}) => {
 
 const findAllVocabulary = async () => {
   return Vocabulary.findAll({ order: [["id", "DESC"]] });
+};
+
+const findVocabularyUpdatedAfter = async (sinceDate) => {
+  if (!sinceDate || Number.isNaN(sinceDate.getTime())) {
+    return findAllVocabulary();
+  }
+  return Vocabulary.findAll({
+    where: { updated_at: { [Op.gt]: sinceDate } },
+    order: [["updated_at", "ASC"]],
+  });
 };
 
 const findVocabularyById = async (id, options = {}) => {
@@ -51,6 +61,7 @@ const countWordsPerTopic = async () => {
 module.exports = {
   createVocabulary,
   findAllVocabulary,
+  findVocabularyUpdatedAfter,
   findVocabularyById,
   updateVocabulary,
   deleteVocabulary,

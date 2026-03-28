@@ -76,9 +76,19 @@ class _ReviewFlashcardState extends State<ReviewFlashcard> {
                     onTap: () => setState(() => _showBack = !_showBack),
                     borderRadius: BorderRadius.circular(8),
                     child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 220),
-                      transitionBuilder: (child, anim) =>
-                          FadeTransition(opacity: anim, child: child),
+                      duration: const Duration(milliseconds: 280),
+                      switchInCurve: Curves.easeOutCubic,
+                      switchOutCurve: Curves.easeInCubic,
+                      transitionBuilder: (child, anim) {
+                        final slide = Tween<Offset>(
+                          begin: const Offset(0, 0.06),
+                          end: Offset.zero,
+                        ).animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic));
+                        return FadeTransition(
+                          opacity: anim,
+                          child: SlideTransition(position: slide, child: child),
+                        );
+                      },
                       child: _showBack ? _buildBack(context) : _buildFront(context),
                     ),
                   ),

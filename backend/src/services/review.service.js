@@ -1,6 +1,7 @@
 const { Op } = require("sequelize");
 const sequelize = require("../config/database");
 const reviewRepository = require("../repositories/review.repository");
+const confusionPairRepository = require("../repositories/confusion-pair.repository");
 const Vocabulary = require("../models/vocabulary.model");
 const {
   REVIEW_LIMIT,
@@ -136,6 +137,12 @@ const submitReview = async ({
       },
       { transaction }
     );
+
+    if (!answerResult && selectedWordId) {
+      await confusionPairRepository.recordWrongSelection(userId, wordId, selectedWordId, {
+        transaction,
+      });
+    }
 
     return progress;
   });

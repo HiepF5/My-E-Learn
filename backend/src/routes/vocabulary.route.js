@@ -14,6 +14,7 @@ const {
 } = require("../validators/content.validator");
 
 router.get("/", vocabularyController.list);
+router.get("/sync", vocabularyController.sync);
 router.get("/:id", vocabularyController.getById);
 router.post("/", validateCreate, vocabularyController.create);
 router.put("/:id", validateUpdate, vocabularyController.update);

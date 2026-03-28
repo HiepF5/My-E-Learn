@@ -9,6 +9,7 @@ import {
   FireOutlined,
   RobotOutlined,
   LogoutOutlined,
+  LineChartOutlined,
 } from "@ant-design/icons";
 
 const { Header, Sider, Content } = Layout;
@@ -25,6 +26,11 @@ const items = [
   { key: "/topics", icon: <TagsOutlined />, label: <Link to="/topics">Topics</Link> },
   { key: "/streak", icon: <FireOutlined />, label: <Link to="/streak">Streak</Link> },
   { key: "/phase-k", icon: <RobotOutlined />, label: <Link to="/phase-k">Phase K Lab</Link> },
+  {
+    key: "/ai-patterns",
+    icon: <LineChartOutlined />,
+    label: <Link to="/ai-patterns">AI patterns</Link>,
+  },
 ];
 
 function AdminLayout() {

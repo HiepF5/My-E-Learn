@@ -26,6 +26,14 @@ class ProfileScreen extends ConsumerWidget {
               trailing: const Icon(Icons.chevron_right),
               onTap: () => context.push('/streak'),
             ),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.science_outlined),
+              title: const Text('Learning lab'),
+              subtitle: const Text('Sentence mining, dictation, grammar'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/learning'),
+            ),
             const SizedBox(height: 12),
             FilledButton(
               onPressed: () async {

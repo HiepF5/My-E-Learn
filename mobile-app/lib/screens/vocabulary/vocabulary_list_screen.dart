@@ -46,7 +46,16 @@ class _VocabularyListScreenState extends ConsumerState<VocabularyListScreen> {
     }).toList();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Vocabulary')),
+      appBar: AppBar(
+        title: const Text('Vocabulary'),
+        actions: [
+          if (!_loading && _rows.isNotEmpty)
+            TextButton(
+              onPressed: () => context.push('/vocabulary/browse'),
+              child: const Text('Flashcards'),
+            ),
+        ],
+      ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : Column(

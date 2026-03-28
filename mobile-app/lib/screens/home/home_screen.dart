@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/cache_service.dart';
 import '../../services/offline_sync_service.dart';
+import '../../services/push_reminders_service.dart';
 import '../../services/today_mission_service.dart';
 import '../../widgets/app_bottom_nav.dart';
 import '../../widgets/today_progress_card.dart';
@@ -32,7 +35,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final cache = CacheService();
     final missionService = TodayMissionService(api, cache);
     try {
-      OfflineSyncService(api, cache).syncVocabularyCache();
+      OfflineSyncService(api, cache).syncVocabularyDelta();
+      unawaited(registerPushWithBackend(api));
       final mission = await missionService.getTodayMission(reviewCap: 20);
       if (!mounted) return;
       setState(() {

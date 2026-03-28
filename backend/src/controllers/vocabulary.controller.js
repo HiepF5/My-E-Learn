@@ -13,6 +13,20 @@ const list = async (req, res, next) => {
   }
 };
 
+const sync = async (req, res, next) => {
+  try {
+    const since = req.query.since || req.query.updated_after;
+    const data = await vocabularyService.syncVocabularyDelta(since);
+    return res.status(200).json({
+      success: true,
+      data,
+      message: "Vocabulary sync",
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 const getById = async (req, res, next) => {
   try {
     const data = await vocabularyService.getVocabularyById(Number(req.params.id));
@@ -70,6 +84,7 @@ const remove = async (req, res, next) => {
 
 module.exports = {
   list,
+  sync,
   getById,
   create,
   update,

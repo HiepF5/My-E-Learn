@@ -11,6 +11,9 @@ function PhaseKPage() {
   const [form] = Form.useForm();
   const [wForm] = Form.useForm();
   const [fForm] = Form.useForm();
+  const [corrForm] = Form.useForm();
+  const [corrected, setCorrected] = useState(null);
+  const [corrLoading, setCorrLoading] = useState(false);
 
   const load = async () => {
     try {
@@ -137,6 +140,52 @@ function PhaseKPage() {
                     { title: "Created", dataIndex: "created_at" },
                   ]}
                 />
+              </Space>
+            ),
+          },
+          {
+            key: "llm-correct",
+            label: "LLM sentence",
+            children: (
+              <Space direction="vertical" style={{ width: "100%" }} size={16}>
+                <Card title="Correct sentence (requires OPENAI_API_KEY on server)">
+                  <Form form={corrForm} layout="vertical" onFinish={submitCorrectSentence}>
+                    <Form.Item
+                      name="sentence"
+                      label="Sentence"
+                      rules={[{ required: true, message: "Enter a sentence" }]}
+                    >
+                      <Input.TextArea rows={4} />
+                    </Form.Item>
+                    <Button type="primary" htmlType="submit" loading={corrLoading}>
+                      Correct with LLM
+                    </Button>
+                  </Form>
+                  {corrected ? (
+                    <Alert
+                      style={{ marginTop: 16 }}
+                      type="success"
+                      message="Result"
+                      description={
+                        <div>
+                          <div>
+                            <strong>Corrected:</strong> {corrected.corrected}
+                          </div>
+                          {corrected.notes ? (
+                            <div style={{ marginTop: 8 }}>
+                              <strong>Notes:</strong> {corrected.notes}
+                            </div>
+                          ) : null}
+                          {corrected.model ? (
+                            <div style={{ marginTop: 8 }}>
+                              <strong>Model:</strong> {corrected.model}
+                            </div>
+                          ) : null}
+                        </div>
+                      }
+                    />
+                  ) : null}
+                </Card>
               </Space>
             ),
           },

@@ -1,6 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Button, Card, Modal, Radio, Space, Spin, Typography, message } from "antd";
+import { SoundOutlined } from "@ant-design/icons";
 import api from "../services/api";
+import { getLearningState, patchLearningState } from "../services/learningState";
+import { speakEnglish } from "../utils/speak";
 
 function shuffle(arr) {
   const a = [...arr];
@@ -27,6 +31,14 @@ function stepLabel(step) {
 }
 
 export default function LearnReviewPage() {
+  const [searchParams] = useSearchParams();
+  const limit = useMemo(() => {
+    const raw = searchParams.get("limit");
+    const n = parseInt(raw ?? "20", 10);
+    if (Number.isNaN(n)) return 20;
+    return Math.min(100, Math.max(1, n));
+  }, [searchParams]);
+
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState([]);
   const [index, setIndex] = useState(0);
@@ -38,24 +50,56 @@ export default function LearnReviewPage() {
   const [againOpen, setAgainOpen] = useState(false);
   const [againPool, setAgainPool] = useState([]);
   const [againPick, setAgainPick] = useState(null);
+  const [ratedThisSession, setRatedThisSession] = useState(0);
+  const [sessionModalOpen, setSessionModalOpen] = useState(false);
+  const [sessionModalRated, setSessionModalRated] = useState(0);
 
-  const current = items[index];
-  const wordId = current ? Number(current.word_id) : null;
+  const itemsRef = useRef(items);
+  const indexRef = useRef(index);
+  useEffect(() => {
+    itemsRef.current = items;
+    indexRef.current = index;
+  }, [items, index]);
+
+  useEffect(() => {
+    return () => {
+      const list = itemsRef.current;
+      const i = indexRef.current;
+      if (list.length && i < list.length) {
+        const wid = Number(list[i].word_id);
+        patchLearningState({ lastReviewWordId: wid, lastScreen: "review" });
+      }
+    };
+  }, []);
 
   const loadQueue = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await api.get("/review/today", { params: { limit: 20 } });
-      const rows = res.data?.data || [];
-      setItems(Array.isArray(rows) ? rows : []);
-      setIndex(0);
+      await patchLearningState({ lastScreen: "review" });
+      const [queueRes, ls] = await Promise.all([
+        api.get("/review/today", { params: { limit } }),
+        getLearningState(),
+      ]);
+      const rows = queueRes.data?.data || [];
+      const list = Array.isArray(rows) ? rows : [];
+      const lastId = ls?.last_review_word_id;
+      let startIndex = 0;
+      if (lastId != null && list.length) {
+        const j = list.findIndex((r) => Number(r.word_id) === Number(lastId));
+        if (j >= 0) startIndex = j;
+      }
+      setItems(list);
+      setIndex(startIndex);
+      setRatedThisSession(0);
       setFlipped(false);
+      setTouch(null);
     } catch {
       setItems([]);
+      setIndex(0);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [limit]);
 
   const loadVocabOptions = useCallback(async () => {
     try {
@@ -77,6 +121,9 @@ export default function LearnReviewPage() {
     loadQueue();
     loadVocabOptions();
   }, [loadQueue, loadVocabOptions]);
+
+  const current = items[index];
+  const wordId = current ? Number(current.word_id) : null;
 
   useEffect(() => {
     if (!wordId) {
@@ -146,12 +193,18 @@ export default function LearnReviewPage() {
         if (selectedWordId != null) body.selected_word_id = selectedWordId;
         await api.post("/review/submit", body);
         const next = idx + 1;
+        const newRatedCount = ratedThisSession + 1;
+        setRatedThisSession(newRatedCount);
         if (next < list.length) {
+          const nextId = Number(list[next].word_id);
+          await patchLearningState({ lastReviewWordId: nextId, lastScreen: "review" });
           setIndex(next);
         } else {
+          await patchLearningState({ clearLastReviewWord: true, lastScreen: "review" });
+          setSessionModalRated(newRatedCount);
+          setSessionModalOpen(true);
           setItems([]);
           setIndex(0);
-          message.success("Done for today");
         }
         setTouch(null);
         setFlipped(false);
@@ -161,7 +214,7 @@ export default function LearnReviewPage() {
         setRatingBusy(false);
       }
     },
-    [wordId, ratingBusy, index, items]
+    [wordId, ratingBusy, index, items, ratedThisSession]
   );
 
   const openAgainModal = useCallback(() => {
@@ -219,6 +272,8 @@ export default function LearnReviewPage() {
     return () => window.removeEventListener("keydown", onKey);
   }, [current, canRate, ratingBusy, openAgainModal, submitReview]);
 
+  const titleText = limit <= 5 ? "Quick review" : "Review";
+
   if (loading) {
     return (
       <div style={{ textAlign: "center", padding: 48 }}>
@@ -230,11 +285,31 @@ export default function LearnReviewPage() {
   if (!current) {
     return (
       <div>
-        <Typography.Title level={2}>Review</Typography.Title>
-        <Typography.Paragraph>Done for today — no due cards in the queue.</Typography.Paragraph>
+        <Typography.Title level={2}>{titleText}</Typography.Title>
+        {ratedThisSession > 0 ? (
+          <Typography.Paragraph>
+            Đã ôn {ratedThisSession} từ trong phiên này. Hẹn gặp lại!
+          </Typography.Paragraph>
+        ) : (
+          <Typography.Paragraph>Done for today — no due cards in the queue.</Typography.Paragraph>
+        )}
         <Button type="primary" onClick={loadQueue}>
           Refresh queue
         </Button>
+        <Modal
+          title="Hoàn thành phiên"
+          open={sessionModalOpen}
+          onOk={() => setSessionModalOpen(false)}
+          onCancel={() => setSessionModalOpen(false)}
+          okText="OK"
+          cancelButtonProps={{ style: { display: "none" } }}
+        >
+          <Typography.Paragraph>
+            {sessionModalRated > 0
+              ? `Bạn đã ôn ${sessionModalRated} từ trong phiên này. Hẹn gặp lại!`
+              : "Bạn đã xong hàng đợi hôm nay."}
+          </Typography.Paragraph>
+        </Modal>
       </div>
     );
   }
@@ -245,13 +320,18 @@ export default function LearnReviewPage() {
 
   return (
     <div>
-      <Typography.Title level={2}>Review</Typography.Title>
+      <Typography.Title level={2}>{titleText}</Typography.Title>
       <Typography.Paragraph type="secondary">
         Space: flip · 1–4: rate (when enabled) — Again / Hard / Good / Easy
       </Typography.Paragraph>
-      <Typography.Text>
-        Card {index + 1} / {items.length} · SRS level {current.level ?? "—"}
-      </Typography.Text>
+      <Space style={{ marginBottom: 8 }}>
+        <Typography.Text>
+          Card {index + 1} / {items.length} · SRS level {current.level ?? "—"}
+        </Typography.Text>
+        <Button type="text" size="small" icon={<SoundOutlined />} onClick={() => speakEnglish(wordLabel)}>
+          Speak
+        </Button>
+      </Space>
       <div style={{ marginTop: 8, marginBottom: 16 }}>
         <Typography.Text strong>
           {canRate ? "Ready to rate" : `Step ${step} / 3 — ${stepLabel(step)}`}

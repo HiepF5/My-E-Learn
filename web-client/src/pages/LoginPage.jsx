@@ -20,6 +20,7 @@ export default function LoginPage() {
       }
       localStorage.setItem("token", res.data.data.token);
       localStorage.setItem("userRole", user.role || "USER");
+      localStorage.setItem("username", user.username || user.email || "");
       navigate("/learn/dashboard");
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");

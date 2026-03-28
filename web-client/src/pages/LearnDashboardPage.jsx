@@ -1,18 +1,26 @@
 import { useEffect, useState } from "react";
-import { Card, Col, Row, Spin, Typography } from "antd";
+import { Button, Card, Col, Row, Space, Spin, Typography } from "antd";
 import { Link } from "react-router-dom";
 import api from "../services/api";
 
 export default function LearnDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [mission, setMission] = useState(null);
+  const [streakDays, setStreakDays] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        const res = await api.get("/topics/today", { params: { review_cap: 20 } });
-        if (!cancelled) setMission(res.data?.data || null);
+        const [mRes, sRes] = await Promise.all([
+          api.get("/topics/today", { params: { review_cap: 20 } }),
+          api.get("/streak/current").catch(() => ({ data: { data: {} } })),
+        ]);
+        if (!cancelled) {
+          setMission(mRes.data?.data || null);
+          const s = sRes.data?.data || {};
+          setStreakDays(Number(s.current_streak) || 0);
+        }
       } catch {
         if (!cancelled) setMission(null);
       } finally {
@@ -38,11 +46,30 @@ export default function LearnDashboardPage() {
 
   return (
     <div>
-      <Typography.Title level={2}>Dashboard</Typography.Title>
+      <Typography.Title level={2}>Today</Typography.Title>
+      <Link to="/learn/review">
+        <Button type="primary" size="large" style={{ marginBottom: 16 }}>
+          Start Learning
+        </Button>
+      </Link>
       <Typography.Paragraph type="secondary">
-        Today&apos;s topic, review queue, weak signals — same data as the mobile home mission.
+        Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 17 ? "afternoon" : "evening"} — same
+        mission data as the mobile home screen.
       </Typography.Paragraph>
-      <Row gutter={[16, 16]}>
+      {streakDays > 0 ? (
+        <Typography.Paragraph>
+          <Link to="/learn/streak">{streakDays} day streak</Link>
+        </Typography.Paragraph>
+      ) : null}
+      <SpaceActions reviewDue={reviewDue} topicName={topicName} topErrors={topErrors} />
+    </div>
+  );
+}
+
+function SpaceActions({ reviewDue, topicName, topErrors }) {
+  return (
+    <>
+      <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
         <Col xs={24} md={8}>
           <Card className="learn-card" title="Today's topic">
             <Typography.Text strong>{topicName}</Typography.Text>
@@ -74,6 +101,11 @@ export default function LearnDashboardPage() {
           </Card>
         </Col>
       </Row>
-    </div>
+      <Space size="large" wrap style={{ marginBottom: 24 }}>
+        <Link to="/learn/review?limit=5">Quick 3 min (5 words)</Link>
+        <Link to="/learn/weak-words">Your weak words</Link>
+        <Link to="/learn/vocabulary">Browse vocabulary</Link>
+      </Space>
+    </>
   );
 }
